@@ -1,3 +1,9 @@
+<?php
+
+    header("location:login.php");
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
