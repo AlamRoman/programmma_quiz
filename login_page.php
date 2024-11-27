@@ -1,3 +1,15 @@
+<?php 
+
+    session_start();
+
+    $msg = "";
+
+    if (isset($_SESSION["msg"])) {
+        $msg = $_SESSION["msg"];
+        unset($_SESSION["msg"]);
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +23,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.css" rel="stylesheet">
 
 </head>
-<body>
+<body style="height: 100vh;">
 
     <section class="h-100 gradient-form" style="background-color: #eee;">
     <div class="container py-5 h-100">
@@ -26,19 +38,25 @@
                         <h4 class="mt-1 mb-5 pb-1"><b>Programma Quiz</b></h4>
                     </div>
 
-                    <form>
+                    <form method="POST" action="php/check_login.php">
                         <p>Login to your account</p>
 
                         <div data-mdb-input-init class="form-outline mb-4">
-                            <input type="email" class="form-control" placeholder="Username" />
+                            <input type="text" id="username" name="username" class="form-control" placeholder="Username" />
                         </div>
 
                         <div data-mdb-input-init class="form-outline mb-4">
-                            <input type="password" class="form-control" placeholder="Password" />
+                            <input type="password" id="password" name="password" class="form-control" placeholder="Password" />
                         </div>
 
                         <div class="text-center pt-1 mb-5 pb-1">
-                            <button data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3" type="button">Log in</button>
+                            <input type="submit" id="login" name="login" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block fa-lg gradient-custom-2" value="Log in">
+                        </div>
+
+                        <div class="text-center pt-1 pb-1">
+                            <?php
+                                echo $msg;
+                            ?>
                         </div>
 
                     </form>
