@@ -42,11 +42,11 @@
                         <p>Login to your account</p>
 
                         <div data-mdb-input-init class="form-outline mb-4">
-                            <input type="text" id="username" name="username" class="form-control" placeholder="Username" />
+                            <input type="text" id="username" name="username" class="form-control" placeholder="Username" required/>
                         </div>
 
                         <div data-mdb-input-init class="form-outline mb-4">
-                            <input type="password" id="password" name="password" class="form-control" placeholder="Password" />
+                            <input type="password" id="password" name="password" class="form-control" placeholder="Password" required/>
                         </div>
 
                         <div class="text-center pt-1 mb-5 pb-1">

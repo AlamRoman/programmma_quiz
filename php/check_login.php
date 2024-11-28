@@ -31,7 +31,6 @@
                 $_SESSION["is_logged_in"] = true;
 
                 go_to("../svolgi_test.php");
-                exit();
 
             }else{
                 $msg = "Incorrect password";
