@@ -1,6 +1,6 @@
 <?php
 
-    include "include/functions.php";
+    include "include/functions.ini";
 
     go_to("login_page.php");
 

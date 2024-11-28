@@ -1,7 +1,7 @@
 <?php
 
     require "../include/db.php";
-    include "../include/functions.php";
+    include "../include/functions.ini";
 
     session_start();
 
