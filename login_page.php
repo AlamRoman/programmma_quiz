@@ -64,7 +64,7 @@
                 </div>
                 </div>
                 <div class="col-lg-6 d-flex align-items-center justify-content-center gradient-custom-2">
-                    <img src="resources/quiz.png" alt="quiz">
+                    <img src="resources/quiz.png" width=380px alt="quiz">
                 </div>
             </div>
             </div>
