@@ -8,6 +8,41 @@
         go_to("login_page.php");
     }
 
+    $domande = array();
+
+    $domande[] = [
+        "nDomanda"=> 1,
+        "testo"=> "Come si calcola l'area del quadrato",
+        "tipo"=> "multipla",
+        "risposte"=> ["b*h/2", "l*l", "PI*r*r", "non lo so"],
+        "corretta"=> 2
+    ];
+
+    $domande[] = [
+        "nDomanda"=> 2,
+        "testo"=> "Scrivi un polinomio",
+        "tipo"=> "aperta",
+        "risposte"=> "",
+        "corretta"=> ""
+    ];
+
+    $domande[] = [
+        "nDomanda"=> 3,
+        "testo"=> "Come si calcola l'area del quadrato",
+        "tipo"=> "multipla",
+        "risposte"=> ["b*h/2", "l*l", "PI*r*r", "non lo so"],
+        "corretta"=> 2
+    ];
+
+    $domande[] = [
+        "nDomanda"=> 4,
+        "testo"=> "Scrivi un polinomio",
+        "tipo"=> "aperta",
+        "risposte"=> "",
+        "corretta"=> ""
+    ];
+
+
 ?>
 
 <!DOCTYPE html>
@@ -23,11 +58,11 @@
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
+        <div class="container-fluid d-flex space-between">
 
-            <h3 class="fw-bold">Welcome <?php echo $_SESSION["username"]; ?>!</h3>
+            <h3 class="fw-bold">Benvenuto <?php echo $_SESSION["username"]; ?>!</h3>
 
-            <h4 class="fw-bold ms-auto text-center" >Do test</h4>
+            <h4 class="fw-bold text-center" >Svolgi Test</h4>
 
             <form class="d-flex" method="POST" action="php/do_logout.php">
                 <input class="btn btn-primary ms-auto" type="submit" id="logout" name="logout" value="logout">
@@ -37,22 +72,12 @@
 
     <div class="mt-3">
 
-        <h2 class="fw-bold text-center my-5">Nome Test</h2>
+        <h2 class="fw-bold text-center my-5">Test matematica</h2>
         <?php 
 
-
+            echo crea_card_da_domande($domande);
 
         ?>
-
-        <div class="d-flex justify-content-center">
-            <div class="card" style="width: 75vw;">
-            <div class="card-body">
-                <h5 class="card-title">Card Title</h5>
-                <p class="card-text">This is a simple card example with some text content to describe the purpose of the card.</p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
-            </div>
-            </div>
-        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
