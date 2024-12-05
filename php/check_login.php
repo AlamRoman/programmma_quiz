@@ -30,7 +30,7 @@
                 $_SESSION["user_email"] = $user["email"];
                 $_SESSION["is_logged_in"] = true;
 
-                go_to("../svolgi_test.php");
+                go_to("../admin_page.php");
 
             }else{
                 $msg = "Incorrect password";

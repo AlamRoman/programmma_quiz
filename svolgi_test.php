@@ -58,11 +58,11 @@
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid d-flex space-between">
+        <div class="container-fluid d-flex justify-content-between">
 
             <h3 class="fw-bold">Benvenuto <?php echo $_SESSION["username"]; ?>!</h3>
 
-            <h4 class="fw-bold text-center" >Svolgi Test</h4>
+            <h4 class="fw-bold text-center" style="transform: translateX(-50%);">Svolgi Test</h4>
 
             <form class="d-flex" method="POST" action="php/do_logout.php">
                 <input class="btn btn-primary ms-auto" type="submit" id="logout" name="logout" value="logout">
@@ -73,11 +73,18 @@
     <div class="mt-3">
 
         <h2 class="fw-bold text-center my-5">Test matematica</h2>
-        <?php 
 
-            echo crea_card_da_domande($domande);
+        <div class="d-flex flex-column w-90">
+            <?php 
+                echo crea_card_da_domande($domande);
 
-        ?>
+            ?>
+
+            <form action="#" class="mb-5 mt-3 mx-auto w-75">
+                <input type="submit" class="btn btn-primary float-right" value="Termina test">
+            </form>
+
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
