@@ -30,7 +30,26 @@
                 $_SESSION["user_email"] = $user["email"];
                 $_SESSION["is_logged_in"] = true;
 
-                go_to("../admin_page.php");
+                $sql = "SELECT id_ruolo FROM ruolo_users WHERE id_user = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("s", $user["id"]);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $ruolo_user = $result->fetch_assoc();
+
+                $id_ruolo  = $ruolo_user["id_ruolo"];
+
+                $_SESSION["id_ruolo"] = $id_ruolo;
+
+                echo $id_ruolo;
+
+                if ($id_ruolo == 1) {//admin
+                    go_to("../admin_page.php");
+                    exit();
+                }else{//altri
+                    go_to("../svolgi_test.php");
+                    exit();
+                }
 
             }else{
                 $msg = "Incorrect password";
