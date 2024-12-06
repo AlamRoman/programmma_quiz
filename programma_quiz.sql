@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 28, 2024 at 10:18 AM
+-- Generation Time: Dec 06, 2024 at 08:29 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -68,6 +68,17 @@ CREATE TABLE `risultati` (
   `id_studente` int(11) NOT NULL,
   `id_test` int(11) NOT NULL,
   `punteggio` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ruolo`
+--
+
+CREATE TABLE `ruolo` (
+  `id` int(11) NOT NULL,
+  `ruolo` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -149,6 +160,12 @@ ALTER TABLE `risultati`
   ADD KEY `id_test` (`id_test`);
 
 --
+-- Indexes for table `ruolo`
+--
+ALTER TABLE `ruolo`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `sessione_test`
 --
 ALTER TABLE `sessione_test`
@@ -183,6 +200,12 @@ ALTER TABLE `domanda`
 -- AUTO_INCREMENT for table `risultati`
 --
 ALTER TABLE `risultati`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `ruolo`
+--
+ALTER TABLE `ruolo`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
