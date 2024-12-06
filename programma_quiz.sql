@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `classe`
 --
 
-CREATE TABLE `classe` (
+CREATE TABLE IF NOT EXISTS `classe` (
   `codice` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -37,7 +37,7 @@ CREATE TABLE `classe` (
 -- Table structure for table `domanda`
 --
 
-CREATE TABLE `domanda` (
+CREATE TABLE IF NOT EXISTS `domanda` (
   `id` int(11) NOT NULL,
   `testo` varchar(2000) NOT NULL,
   `tipo` varchar(255) NOT NULL DEFAULT 'freetext',
@@ -50,7 +50,7 @@ CREATE TABLE `domanda` (
 -- Table structure for table `risposte`
 --
 
-CREATE TABLE `risposte` (
+CREATE TABLE IF NOT EXISTS `risposte` (
   `id` int(11) NOT NULL,
   `testo` varchar(2000) DEFAULT NULL,
   `corretta` tinyint(1) NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE `risposte` (
 -- Table structure for table `risultati`
 --
 
-CREATE TABLE `risultati` (
+CREATE TABLE IF NOT EXISTS `risultati` (
   `id` int(11) NOT NULL,
   `id_studente` int(11) NOT NULL,
   `id_test` int(11) NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE `risultati` (
 -- Table structure for table `ruolo`
 --
 
-CREATE TABLE `ruolo` (
+CREATE TABLE IF NOT EXISTS `ruolo` (
   `id` int(11) NOT NULL,
   `ruolo` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -87,7 +87,7 @@ CREATE TABLE `ruolo` (
 -- Table structure for table `sessione_test`
 --
 
-CREATE TABLE `sessione_test` (
+CREATE TABLE IF NOT EXISTS `sessione_test` (
   `id` int(11) NOT NULL,
   `id_test` int(11) NOT NULL,
   `codice_classe` varchar(25) NOT NULL
@@ -99,7 +99,7 @@ CREATE TABLE `sessione_test` (
 -- Table structure for table `test`
 --
 
-CREATE TABLE `test` (
+CREATE TABLE IF NOT EXISTS `test` (
   `id` int(11) NOT NULL,
   `titolo` varchar(255) NOT NULL,
   `descrizione` text DEFAULT NULL
@@ -111,7 +111,7 @@ CREATE TABLE `test` (
 -- Table structure for table `users`
 --
 
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
@@ -263,7 +263,7 @@ COMMIT;
 
 
 
-CREATE TABLE ruolo_users(
+CREATE TABLE IF NOT EXISTS ruolo_users(
     id_ruolo int,
     id_user int,
     PRIMARY KEY(id_ruolo, id_user),
