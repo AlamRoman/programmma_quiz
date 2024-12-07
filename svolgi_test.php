@@ -3,13 +3,49 @@
     session_start();
 
     include "include/functions.ini";
+    include "include/db.php";
 
     if (!isset($_SESSION["is_logged_in"]) || $_SESSION["is_logged_in"] == false) {
         go_to("login_page.php");
     }
 
-    $domande = array();
+    $id_test = 1;
 
+    //prendi il test da database
+    $sql = "SELECT * FROM test WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id_test);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $test = $result->fetch_assoc();
+
+    //prendi le domande del test
+    $sql = "SELECT * FROM domanda WHERE id_test = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id_test);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $domande = $result->fetch_all(MYSQLI_ASSOC);
+
+    //prendi le risposte di ogni domanda
+    for ($i=0; $i < count($domande); $i++) { 
+        $sql = "SELECT * FROM risposta WHERE id_domanda = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $domande[$i]["id"]);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $risposte = $result->fetch_all(MYSQLI_ASSOC);
+
+        $r = array();
+
+        foreach($risposte as $risposta){
+            $r[] = $risposta["testo"];
+        }
+
+        $domande[$i]["risposte"] = $r;
+    }
+
+    /*
     $domande[] = [
         "nDomanda"=> 1,
         "testo"=> "Come si calcola l'area del quadrato",
@@ -25,23 +61,7 @@
         "risposte"=> "",
         "corretta"=> ""
     ];
-
-    $domande[] = [
-        "nDomanda"=> 3,
-        "testo"=> "Come si calcola l'area del quadrato",
-        "tipo"=> "multipla",
-        "risposte"=> ["b*h/2", "l*l", "PI*r*r", "non lo so"],
-        "corretta"=> 2
-    ];
-
-    $domande[] = [
-        "nDomanda"=> 4,
-        "testo"=> "Scrivi un polinomio",
-        "tipo"=> "aperta",
-        "risposte"=> "",
-        "corretta"=> ""
-    ];
-
+    */
 
 ?>
 
@@ -72,12 +92,11 @@
 
     <div class="mt-3">
 
-        <h2 class="fw-bold text-center my-5">Test matematica</h2>
+        <h2 class="fw-bold text-center my-5"><?php echo $test["titolo"] ?></h2>
 
         <div class="d-flex flex-column w-90">
             <?php 
                 echo crea_card_da_domande($domande);
-
             ?>
 
             <form action="#" class="mb-5 mt-3 mx-auto w-75">
