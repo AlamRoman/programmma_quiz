@@ -3,10 +3,56 @@
     session_start();
 
     include "include/functions.ini";
+    include "include/db.php";
+
+    $msg = "";
+    if (isset($_SESSION["msg"])) {
+        $msg = $_SESSION["msg"];
+        unset($_SESSION["msg"]);
+    }
 
     if (!isset($_SESSION["is_logged_in"]) || $_SESSION["is_logged_in"] == false) {
         go_to("login_page.php");
     }
+
+    //prendi tutti utenti dal db
+    $sql = "SELECT * FROM users";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $fields = $result->fetch_fields();
+    $users = $result->fetch_all(MYSQLI_ASSOC);
+
+    //crea la tabella
+    $table = '<table class="table table-striped table-hover table-bordered">';
+
+    $table .= '<tr><thead class="table-dark">';
+    foreach ($fields as $field) {
+        $table .= "<th>$field->name</th>";
+    }
+    $table .= "<th>ruolo</th>";
+    $table .= "</thead></tr><tbody>";
+
+    foreach ($users as $user) {
+        $table .= "<tr>";
+
+        foreach ($user as $data) {
+            $table .= "<td>$data</td>";
+        }
+
+        $sql = "SELECT ruolo FROM ruolo_users WHERE id_user = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $user["id"]);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $ruolo = $result->fetch_assoc();
+
+        $table .= '<td>'.$ruolo["ruolo"].'</td>';
+
+        $table .= "</tr>";
+    }
+
+    $table .= "</tbody></table>";
 
 ?>
 
@@ -36,11 +82,11 @@
         </div>
     </nav>
 
-    <div class="container my-5 d-flex">
-        <div class="container m-3 border p-3" style="width: 30vw;">
+    <div class="container my-5 d-flex flex-wrap">
+        <div class="container m-3 border p-3" style="min-width: 30vw; max-width: 50vw;">
             <h3 class="text-center my-3">Registra/modifica utente</h3>
             <hr>
-            <form action="#">
+            <form action="php/registra_utente.php" method="POST">
                 <div class="my-2">
                     <label for="username" class="form-label">Username </label>
                     <input type="text" id="username" name="username" class="form-control">
@@ -55,7 +101,7 @@
                 </div>
                 <div class="my-2">
                     <label for="Nome" class="form-label">Nome </label>
-                    <input type="text" id="Nome" name="Nome" class="form-control">
+                    <input type="text" id="nome" name="nome" class="form-control">
                 </div>
                 <div class="my-2">
                     <label for="cognome" class="form-label">Cognome </label>
@@ -69,8 +115,17 @@
                         <option value="docente">Docente</option>
                     </select>
                 </div>
+                <?php 
+                    if($msg != ""){
+                        echo '
+                            <div class="alert alert-primary mt-3" role="alert">
+                                '.$msg.'
+                            </div>
+                        ';
+                    }
+                 ?>
                 <div class="mt-5 d-flex justify-content-center">
-                    <input type="submit" name="registra" id="registra" value="Invia" class="btn btn-primary">
+                    <input type="submit" name="invia" id="invia" value="Invia" class="btn btn-primary">
                 </div>
             </form>
         </div>
@@ -78,36 +133,9 @@
         <div class="container m-3 border p-3">
             <h3 class="text-center my-3">Tabella Utenti</h3>
             <hr>
-            <table class="table table-striped table-hover">
-                <tr>
-                    <th>Test</th>
-                    <th>Test</th>
-                    <th>Test</th>
-                    <th>Test</th>
-                    <th>Test</th>
-                </tr>
-                <tr>
-                    <td>test</td>
-                    <td>test</td>
-                    <td>test</td>
-                    <td>test</td>
-                    <td>test</td>
-                </tr>
-                <tr>
-                    <td>test</td>
-                    <td>test</td>
-                    <td>test</td>
-                    <td>test</td>
-                    <td>test</td>
-                </tr>
-                <tr>
-                    <td>test</td>
-                    <td>test</td>
-                    <td>test</td>
-                    <td>test</td>
-                    <td>test</td>
-                </tr>
-            </table>
+            <div class="table-responsive">
+                <?php  echo $table;?>
+            </div>
         </div>
     </div>
 
