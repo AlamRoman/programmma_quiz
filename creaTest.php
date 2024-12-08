@@ -9,6 +9,93 @@
         go_to("login_page.php");
     }
 
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["salva_test"])) {
+        $titolo = $_POST['titolo'] ?? 'Test';
+        $descrizione = $_POST['descrizione'] ?? '';
+        $tipi = $_POST['tipo'] ?? [];
+        $domandeAperte = $_POST['aperta'] ?? [];
+        $domandeMultiple = $_POST['multipla'] ?? [];
+        $opzioni = $_POST['opzioni'] ?? [];
+        $risposteCorrette = $_POST['rispostaCorretta'] ?? [];
+
+        /*
+        print_r($opzioni);
+
+        // File name for the CSV
+        $filename = 'test_' . time() . '.csv';
+
+        // Open a file for writing
+        $file = fopen($filename, 'w');
+
+        // Add test metadata
+        fputcsv($file, ['Titolo', 'Descrizione']);
+        fputcsv($file, [$titolo, $descrizione]);
+        fputcsv($file, []); // Empty line for separation
+
+        // Add questions
+        fputcsv($file, ['Tipo', 'Domanda', 'Opzioni', 'Risposta Corretta']);
+        $aIndex = 0;
+        $mIndex = 0;
+        foreach ($tipi as $index => $tipo) {
+            if ($tipo === 'aperta') {
+                fputcsv($file, ['Aperta', $domandeAperte[$aIndex], '', '']);
+                $aIndex++;
+            } elseif ($tipo === 'multipla') {
+                $opzioniString = implode(' | ', $opzioni[$mIndex]);
+                $corretta = $risposteCorrette[$mIndex] ?? '';
+                fputcsv($file, ['Multipla', $domandeMultiple[$mIndex], $opzioniString, $corretta]);
+                $mIndex++;
+            }
+        }
+
+        fclose($file);
+
+        // Output success message
+        echo "CSV file created successfully: <a href='$filename'>Download $filename</a>";
+        */
+
+        $sql = "INSERT INTO test (titolo, descrizione) VALUES (?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $titolo, $descrizione);
+        $stmt->execute();
+        $test_id = $stmt->insert_id;
+
+        //index di domande aperte e multiple
+        $aIndex = 0;
+        $mIndex = 0;
+        foreach ($tipi as $index => $tipo) {
+            if ($tipo === 'aperta') {
+                //inserisci domanda aperta
+                $sql = "INSERT INTO domanda(id_test, tipo, testo) VALUES (?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("iss", $test_id, $tipo, $domandeAperte[$aIndex]);
+                $stmt->execute();
+                $aIndex++;
+            } elseif ($tipo === 'multipla') {
+                //inserisci domanda multipla
+                $sql = "INSERT INTO domanda (id_test, tipo, testo) VALUES (?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("iss", $test_id, $tipo, $domandeMultiple[$mIndex]);
+                $stmt->execute();
+                $domanda_id = $stmt->insert_id; // Get the last inserted question ID
+    
+                // inserisci riposte
+                foreach ($opzioni[$mIndex] as $key => $risposta) {
+                    $isCorrect = ($key + 1 == $risposteCorrette[$mIndex]) ? 1 : 0;
+                    $sql = "INSERT INTO risposta (id_domanda, testo, corretta) VALUES (?, ?, ?)";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("isi", $domanda_id, $risposta, $isCorrect);
+                    $stmt->execute();
+                }
+                $mIndex++;
+            }
+        }
+
+        header("location:docenti.php");
+    }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -39,12 +126,12 @@
     </nav>
 
     <div class="container mt-5 border p-5 d-flex flex-column gap-5">
-        <form action="#" class="d-flex flex-column gap-5">
+        <form action="creaTest.php" method="POST" class="d-flex flex-column gap-5">
             <div class="border p-3">
                 <h3>Dati test</h3>
                 <div class="d-flex gap-5 mt-3">
                     <div>
-                        <input class="form-control" type="text" id="titolo" name="titolo" placeholder="Nome del test">
+                        <input class="form-control" type="text" id="titolo" name="titolo" placeholder="Nome del test" required>
                     </div>
                     <div>
                         <input class="form-control" type="text" id="descrizione" name="descrizione" placeholder="Descrizione">
@@ -74,6 +161,7 @@
     <script>
 
         let nDom = 1;
+        let nMultipla = 0;
         
         document.getElementById('aggiungi-domanda').addEventListener('click', function (event) {
             event.preventDefault(); // Prevent form submission or page reload
@@ -104,10 +192,10 @@
                     </div>
                     <div class="form-group mt-2">
                         <label>Opzioni</label>
-                        <input type="text" class="form-control mb-2" name="opzioni[][0]" placeholder="Opzione 1">
-                        <input type="text" class="form-control mb-2" name="opzioni[][1]" placeholder="Opzione 2">
-                        <input type="text" class="form-control mb-2" name="opzioni[][2]" placeholder="Opzione 3">
-                        <input type="text" class="form-control mb-2" name="opzioni[][3]" placeholder="Opzione 4">
+                        <input type="text" class="form-control mb-2" name="opzioni[${nMultipla}][0]" placeholder="Opzione 1">
+                        <input type="text" class="form-control mb-2" name="opzioni[${nMultipla}][1]" placeholder="Opzione 2">
+                        <input type="text" class="form-control mb-2" name="opzioni[${nMultipla}][2]" placeholder="Opzione 3">
+                        <input type="text" class="form-control mb-2" name="opzioni[${nMultipla}][3]" placeholder="Opzione 4">
                     </div>
                     <div class="form-group mt-2">
                         <label for="risposta">Risposta corretta</label>
@@ -120,6 +208,7 @@
                     </div>
                 `;
                 nDom++;
+                nMultipla++;
             }
 
             document.querySelector('.domande-container').appendChild(questionContainer);
