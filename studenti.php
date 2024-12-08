@@ -54,7 +54,7 @@
                             echo '<h6>' . htmlspecialchars($row['titolo']) . '</h6>';
                             echo '<p>' . htmlspecialchars($row['descrizione']) . '</p>';
                             echo '</div>';
-                            echo '<div class="my-auto d-flex gap-5"><button class="btn btn-success"><i class="bi bi-journal-text"></i> Svolgi</button><div>';
+                            echo '<div class="my-auto d-flex gap-5"><a href="svolgi_test.php?id_test='.$row["id"].'" class="btn btn-success"><i class="bi bi-journal-text"></i> Svolgi</a><div>';
                             echo '</li>';
                         }
                     } else {

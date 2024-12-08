@@ -9,7 +9,12 @@
         go_to("login_page.php");
     }
 
-    $id_test = 1;
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["id_test"])){
+        $id_test = $_GET["id_test"];
+    }else{
+        go_to("studenti.php");
+        exit();
+    }
 
     //prendi il test da database
     $sql = "SELECT * FROM test WHERE id = ?";
@@ -45,24 +50,6 @@
         $domande[$i]["risposte"] = $r;
     }
 
-    /*
-    $domande[] = [
-        "nDomanda"=> 1,
-        "testo"=> "Come si calcola l'area del quadrato",
-        "tipo"=> "multipla",
-        "risposte"=> ["b*h/2", "l*l", "PI*r*r", "non lo so"],
-        "corretta"=> 2
-    ];
-
-    $domande[] = [
-        "nDomanda"=> 2,
-        "testo"=> "Scrivi un polinomio",
-        "tipo"=> "aperta",
-        "risposte"=> "",
-        "corretta"=> ""
-    ];
-    */
-
 ?>
 
 <!DOCTYPE html>
@@ -73,7 +60,8 @@
     <title>Svolgi - test</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
 
@@ -85,7 +73,7 @@
             <h4 class="fw-bold text-center" style="transform: translateX(-50%);">Svolgi Test</h4>
 
             <form class="d-flex" method="POST" action="php/do_logout.php">
-                <input class="btn btn-seconary ms-auto" type="submit" id="logout" name="logout" value="logout">
+                <input class="btn btn-secondary ms-auto" type="submit" id="logout" name="logout" value="logout">
             </form>
         </div>
     </nav>
