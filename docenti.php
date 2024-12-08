@@ -20,6 +20,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 </head>
 <body>
@@ -40,8 +41,8 @@
     <div class="container mt-5">
         <div class="d-flex justify-content-between">
             <h3 class="my-3">Test creati</h3>
-            <a href="creaTest.php">
-                <button class="btn btn-success my-auto">Nuovo</button>
+            <a href="creaTest.php" class="my-auto">
+                <button class="btn btn-success my-auto"><i class="bi bi-plus-lg"></i></button>
             </a>
         </div>
         <hr>
@@ -52,21 +53,30 @@
                         <h6>Test di informatica</h6>
                         <p>Descrione del test di informatica.</p>
                     </div>
-                    <button class="btn btn-light">modifia</button>
+                    <div class="my-auto">
+                        <button class="btn btn-danger"><i class="bi bi-trash"></i></button>
+                        <button class="btn btn-secondary"><i class="bi bi-pencil-square"></i></button>
+                    </div>
                 </li>
                 <li class="list-group-item list-group-item-action d-flex justify-content-between border">
                     <div>
                         <h6>Test di informatica</h6>
                         <p>Descrione del test di informatica.</p>
                     </div>
-                    <button class="btn btn-light">modifia</button>
+                    <div class="my-auto">
+                        <button class="btn btn-danger"><i class="bi bi-trash"></i></button>
+                        <button class="btn btn-secondary"><i class="bi bi-pencil-square"></i></button>
+                    </div>
                 </li>
                 <li class="list-group-item list-group-item-action d-flex justify-content-between border">
                     <div>
                         <h6>Test di informatica</h6>
                         <p>Descrione del test di informatica.</p>
                     </div>
-                    <button class="btn btn-light">modifia</button>
+                    <div class="my-auto">
+                        <button class="btn btn-danger"><i class="bi bi-trash"></i></button>
+                        <button class="btn btn-secondary"><i class="bi bi-pencil-square"></i></button>
+                    </div>
                 </li>
             </ul>
         </div>
