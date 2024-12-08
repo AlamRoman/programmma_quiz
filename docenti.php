@@ -66,7 +66,7 @@
 
     <div class="container mt-5">
         <div class="d-flex justify-content-between">
-            <h3 class="my-3">Test creati</h3>
+            <h3 class="my-3">Lista Test</h3>
             <a href="creaTest.php" class="my-auto">
                 <button class="btn btn-success my-auto"><i class="bi bi-plus-lg"></i></button>
             </a>
