@@ -5,14 +5,14 @@
     include "include/functions.ini";
     include "include/db.php";
 
+    if (!isset($_SESSION["is_logged_in"]) || $_SESSION["is_logged_in"] == false) {
+        go_to("login_page.php");
+    }
+
     $msg = "";
     if (isset($_SESSION["msg"])) {
         $msg = $_SESSION["msg"];
         unset($_SESSION["msg"]);
-    }
-
-    if (!isset($_SESSION["is_logged_in"]) || $_SESSION["is_logged_in"] == false) {
-        go_to("login_page.php");
     }
 
     //prendi tutti utenti dal db
@@ -77,7 +77,7 @@
             <h4 class="fw-bold text-center" style="transform: translateX(-50%);">Pagina Admin</h4>
 
             <form class="d-flex" method="POST" action="php/do_logout.php">
-                <input class="btn btn-primary ms-auto" type="submit" id="logout" name="logout" value="logout">
+                <input class="btn btn-secondary ms-auto" type="submit" id="logout" name="logout" value="logout">
             </form>
         </div>
     </nav>

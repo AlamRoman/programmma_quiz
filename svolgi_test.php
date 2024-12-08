@@ -85,7 +85,7 @@
             <h4 class="fw-bold text-center" style="transform: translateX(-50%);">Svolgi Test</h4>
 
             <form class="d-flex" method="POST" action="php/do_logout.php">
-                <input class="btn btn-primary ms-auto" type="submit" id="logout" name="logout" value="logout">
+                <input class="btn btn-seconary ms-auto" type="submit" id="logout" name="logout" value="logout">
             </form>
         </div>
     </nav>
