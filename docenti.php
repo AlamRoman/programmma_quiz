@@ -47,6 +47,21 @@
                     <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
                 </div></div>';
         }
+
+        if (isset($_GET["deleted"])) {
+            if ($_GET["deleted"] == 1) {
+                echo '<div class="container mt-5"><div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle-fill"></i> Test eliminato con successo!
+                        <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+                    </div></div>';
+            } elseif ($_GET["deleted"] == 0) {
+                echo '<div class="container mt-5"><div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-x-circle-fill"></i> Errore durante l\'eliminazione del test.
+                        <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+                    </div></div>';
+            }
+        }
+
     ?>
 
     <div class="container mt-5">
@@ -68,7 +83,7 @@
                         echo '<p>' . htmlspecialchars($row['descrizione']) . '</p>';
                         echo '</div>';
                         echo '<div class="my-auto d-flex gap-3">';
-                        echo '<button class="btn btn-danger"><i class="bi bi-trash"></i></button>';
+                        echo '<a href="#" class="btn btn-danger" onclick="return confirmDelete(' . $row['id'] . ')"><i class="bi bi-trash"></i></a>';
                         echo '<button class="btn btn-secondary"><i class="bi bi-pencil-square"></i></button>';
                         echo '</div>';
                         echo '</li>';
@@ -81,6 +96,17 @@
             </ul>
         </div>
     </div>
+
+    <script>
+        function confirmDelete(id) {
+            var confirmDelete = confirm("Sei sicuro di voler eliminare questo test?");
+            if (confirmDelete) {
+                window.location.href = "php/deleteTest.php?id=" + id;
+            }
+            return false;
+        }
+    </script>
+
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
