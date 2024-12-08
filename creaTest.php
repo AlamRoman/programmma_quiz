@@ -92,7 +92,7 @@
             }
         }
 
-        header("location:docenti.php");
+        header("location:docenti.php?testCreato=1");
     }
 
 
