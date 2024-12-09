@@ -87,7 +87,7 @@
                 echo crea_card_da_domande($domande);
             ?>
 
-            <form action="#" class="mb-5 mt-3 mx-auto w-75">
+            <form action="riepilogo.php" class="mb-5 mt-3 mx-auto w-75">
                 <input type="submit" class="btn btn-primary float-right" value="Termina test">
             </form>
 

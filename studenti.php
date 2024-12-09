@@ -42,7 +42,7 @@
     </nav>
 
     <div class="container mt-5">
-        <h3 class="my-3">Test da svolgere</h3>
+        <h3 class="my-3">Test Svolto</h3>
         <hr>
         <div>
             <ul class="list-group">
@@ -54,7 +54,8 @@
                             echo '<h6>' . htmlspecialchars($row['titolo']) . '</h6>';
                             echo '<p>' . htmlspecialchars($row['descrizione']) . '</p>';
                             echo '</div>';
-                            echo '<div class="my-auto d-flex gap-5"><a href="svolgi_test.php?id_test='.$row["id"].'" class="btn btn-success"><i class="bi bi-journal-text"></i> Svolgi</a><div>';
+                            echo '<div class="my-auto d-flex gap-2"><a href="riepilogo.php?id_test='.$row["id"].'" class="btn btn-warning"><i class="bi bi-eye"></i> Riepilogo</a>';
+                            echo '<a href="svolgi_test.php?id_test='.$row["id"].'" class="btn btn-success"><i class="bi bi-journal-text"></i> Svolgi</a></div>';
                             echo '</li>';
                         }
                     } else {
