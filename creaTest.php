@@ -19,42 +19,7 @@
         $opzioni = $_POST['opzioni'] ?? [];
         $risposteCorrette = $_POST['rispostaCorretta'] ?? [];
 
-        /*
-        print_r($opzioni);
-
-        // File name for the CSV
-        $filename = 'test_' . time() . '.csv';
-
-        // Open a file for writing
-        $file = fopen($filename, 'w');
-
-        // Add test metadata
-        fputcsv($file, ['Titolo', 'Descrizione']);
-        fputcsv($file, [$titolo, $descrizione]);
-        fputcsv($file, []); // Empty line for separation
-
-        // Add questions
-        fputcsv($file, ['Tipo', 'Domanda', 'Opzioni', 'Risposta Corretta']);
-        $aIndex = 0;
-        $mIndex = 0;
-        foreach ($tipi as $index => $tipo) {
-            if ($tipo === 'aperta') {
-                fputcsv($file, ['Aperta', $domandeAperte[$aIndex], '', '']);
-                $aIndex++;
-            } elseif ($tipo === 'multipla') {
-                $opzioniString = implode(' | ', $opzioni[$mIndex]);
-                $corretta = $risposteCorrette[$mIndex] ?? '';
-                fputcsv($file, ['Multipla', $domandeMultiple[$mIndex], $opzioniString, $corretta]);
-                $mIndex++;
-            }
-        }
-
-        fclose($file);
-
-        // Output success message
-        echo "CSV file created successfully: <a href='$filename'>Download $filename</a>";
-        */
-
+        //crea il test
         $sql = "INSERT INTO test (titolo, descrizione) VALUES (?, ?)";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $titolo, $descrizione);
@@ -173,21 +138,27 @@
             const tipoDomanda = document.getElementById('tipoNuovaDomanda').value;
             
             if (tipoDomanda === 'aperta') {
-                // Structure for "Domanda aperta"
+                // domanda aperta
                 questionContainer.innerHTML = `
                     <input type="hidden" name="tipo[]" value="aperta">
                     <div class="form-group">
-                        <label for="aperta">Domanda ${nDom}</label>
+                        <label for="aperta" class="d-flex justify-content-between">
+                            <h5>Domanda ${nDom}</h5>
+                            <button type="button" class="btn btn-danger delete-question mb-2"><i class="bi bi-x-lg"></i></button>
+                        </label>
                         <input type="text" class="form-control" name="aperta[]" placeholder="Scrivi domanda">
                     </div>
                 `;
                 nDom++;
             } else if (tipoDomanda === 'multipla') {
-                // Structure for "Domanda risposta multipla"
+                // domanda a risposta multipla
                 questionContainer.innerHTML = `
                     <input type="hidden" name="tipo[]" value="multipla">
                     <div class="form-group">
-                        <label for="multipla">Domanda ${nDom}</label>
+                        <label for="aperta" class="d-flex justify-content-between">
+                            <h5>Domanda ${nDom}</h5>
+                            <button type="button" class="btn btn-danger delete-question mb-2"><i class="bi bi-x-lg"></i></button>
+                        </label>
                         <input type="text" class="form-control" name="multipla[]" placeholder="Inserisci domanda">
                     </div>
                     <div class="form-group mt-2">
@@ -206,13 +177,60 @@
                             <option value="4">4</option>
                         </select>
                     </div>
-                `;
+                    `;
                 nDom++;
                 nMultipla++;
             }
 
             document.querySelector('.domande-container').appendChild(questionContainer);
         });
+
+        document.querySelector('.domande-container').addEventListener('click', function (event) {
+            if (event.target.classList.contains('delete-question') || event.target.closest('.delete-question')) {
+                const questionElement = event.target.closest('.border');
+                
+                if (questionElement.querySelector('input[name="tipo[]"][value="aperta"]')) {
+                    nDom--;
+                } else if (questionElement.querySelector('input[name="tipo[]"][value="multipla"]')) {
+                    nDom--;
+                    nMultipla--;
+                }
+
+                questionElement.remove();
+
+                updateQuestionLabelsAndOptions();
+            }
+        });
+
+        //aggiorna domande quando viene eliminato una domanda
+        function updateQuestionLabelsAndOptions() {
+            const questions = document.querySelectorAll('.domande-container .border');
+            let questionNumber = 1;
+            let multipleChoiceIndex = 0;
+
+            questions.forEach((question) => {
+                const label = question.querySelector('label');
+                if (label) {
+                    label.innerHTML = `<h5>Domanda ${questionNumber}<h5>`;
+                    questionNumber++;
+                }
+
+                if (question.querySelector('input[name="tipo[]"][value="multipla"]')) {
+                    const options = question.querySelectorAll('input[name^="opzioni"]');
+                    options.forEach((option, index) => {
+                        option.name = `opzioni[${multipleChoiceIndex}][${index}]`;
+                    });
+
+                    const correctAnswerSelect = question.querySelector('select[name^="rispostaCorretta"]');
+                    if (correctAnswerSelect) {
+                        correctAnswerSelect.name = `rispostaCorretta[${multipleChoiceIndex}]`;
+                    }
+
+                    multipleChoiceIndex++;
+                }
+            });
+        }
+
     </script>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
