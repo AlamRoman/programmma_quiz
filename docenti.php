@@ -40,6 +40,14 @@
         </div>
     </nav>
 
+    <div class="ms-5 mt-3">
+    <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">Home</li>
+    </ol>
+    </nav>
+    </div>
+
     <?php 
         if(isset($_GET["testCreato"]) && $_GET["testCreato"]==1){
             echo '<div class="container mt-5"><div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -84,7 +92,7 @@
                         echo '</div>';
                         echo '<div class="my-auto d-flex gap-3">';
                         echo '<a href="#" class="btn btn-danger" onclick="return confirmDelete(' . $row['id'] . ')"><i class="bi bi-trash"></i></a>';
-                        echo '<button class="btn btn-secondary"><i class="bi bi-pencil-square"></i></button>';
+                        echo '<a class="btn btn-secondary" href="modificaTest.php?id_test='.$row["id"].'"><i class="bi bi-pencil-square"></i></a>';
                         echo '</div>';
                         echo '</li>';
                     }

@@ -1,4 +1,4 @@
-<?php 
+<?php  
 
     session_start();
 
@@ -9,55 +9,40 @@
         go_to("login_page.php");
     }
 
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["id_test"])){
+        $id_test = $_GET["id_test"];
+    }else{
+        go_to("docenti.php");
+        exit();
+    }
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["salva_test"])) {
-        $titolo = $_POST['titolo'] ?? 'Test';
-        $descrizione = $_POST['descrizione'] ?? '';
-        $tipi = $_POST['tipo'] ?? [];
-        $domandeAperte = $_POST['aperta'] ?? [];
-        $domandeMultiple = $_POST['multipla'] ?? [];
-        $opzioni = $_POST['opzioni'] ?? [];
-        $risposteCorrette = $_POST['rispostaCorretta'] ?? [];
+    //prendi il test dal database
+    $sql = "SELECT * FROM test WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id_test);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $test = $result->fetch_assoc();
 
-        //crea il test
-        $sql = "INSERT INTO test (titolo, descrizione) VALUES (?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $titolo, $descrizione);
-        $stmt->execute();
-        $test_id = $stmt->insert_id;
+    // prendi le domande dal database
+    $sql_questions = "SELECT * FROM domanda WHERE id_test = ?";
+    $stmt_questions = $conn->prepare($sql_questions);
+    $stmt_questions->bind_param("i", $id_test);
+    $stmt_questions->execute();
+    $result_questions = $stmt_questions->get_result();
+    $domande = $result_questions->fetch_all(MYSQLI_ASSOC);
 
-        //index di domande aperte e multiple
-        $aIndex = 0;
-        $mIndex = 0;
-        foreach ($tipi as $index => $tipo) {
-            if ($tipo === 'aperta') {
-                //inserisci domanda aperta
-                $sql = "INSERT INTO domanda(id_test, tipo, testo) VALUES (?, ?, ?)";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("iss", $test_id, $tipo, $domandeAperte[$aIndex]);
-                $stmt->execute();
-                $aIndex++;
-            } elseif ($tipo === 'multipla') {
-                //inserisci domanda multipla
-                $sql = "INSERT INTO domanda (id_test, tipo, testo) VALUES (?, ?, ?)";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("iss", $test_id, $tipo, $domandeMultiple[$mIndex]);
-                $stmt->execute();
-                $domanda_id = $stmt->insert_id; // Get the last inserted question ID
-    
-                // inserisci riposte
-                foreach ($opzioni[$mIndex] as $key => $risposta) {
-                    $isCorrect = ($key + 1 == $risposteCorrette[$mIndex]) ? 1 : 0;
-                    $sql = "INSERT INTO risposta (id_domanda, testo, corretta) VALUES (?, ?, ?)";
-                    $stmt = $conn->prepare($sql);
-                    $stmt->bind_param("isi", $domanda_id, $risposta, $isCorrect);
-                    $stmt->execute();
-                }
-                $mIndex++;
-            }
-        }
+    // prendi le risposte delle domande multiple
+    $sql_options = "SELECT * FROM risposta WHERE id_domanda IN (SELECT id FROM domanda WHERE id_test = ?)";
+    $stmt_options = $conn->prepare($sql_options);
+    $stmt_options->bind_param("i", $id_test);
+    $stmt_options->execute();
+    $result_options = $stmt_options->get_result();
+    $opzioni = $result_options->fetch_all(MYSQLI_ASSOC);
 
-        header("location:docenti.php?testCreato=1");
+    $grouped_options = [];
+    foreach ($opzioni as $opzione) {
+        $grouped_options[$opzione['id_domanda']][] = $opzione;
     }
 
 
@@ -68,7 +53,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crea test</title>
+    <title>Modifica Test</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -82,7 +67,7 @@
 
             <h3 class="fw-bold">Benvenuto <?php echo $_SESSION["username"]; ?>!</h3>
 
-            <h4 class="fw-bold text-center" style="transform: translateX(-50%);">Crea Test</h4>
+            <h4 class="fw-bold text-center" style="transform: translateX(-50%);">Modifica Test</h4>
 
             <form class="d-flex" method="POST" action="php/do_logout.php">
                 <input class="btn btn-secondary ms-auto" type="submit" id="logout" name="logout" value="logout">
@@ -94,32 +79,64 @@
     <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="docenti.php">Home</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Crea test</li>
+        <li class="breadcrumb-item active" aria-current="page">Modifica Test</li>
     </ol>
     </nav>
     </div>
 
     <div class="container mt-5 border p-5 d-flex flex-column gap-5">
-        <form action="creaTest.php" method="POST" class="d-flex flex-column gap-5">
+        <form action="modificaTest.php" method="POST" class="d-flex flex-column gap-5">
+
             <div class="border p-3">
                 <h3>Dati test</h3>
                 <div class="d-flex gap-5 mt-3">
                     <div>
-                        <input class="form-control" type="text" id="titolo" name="titolo" placeholder="Nome del test" required>
+                        <input class="form-control" type="text" id="titolo" name="titolo" placeholder="Nome del test" required <?php echo 'value="'.$test["titolo"].'"';  ?>>
                     </div>
                     <div>
-                        <input class="form-control" type="text" id="descrizione" name="descrizione" placeholder="Descrizione">
+                        <input class="form-control" type="text" id="descrizione" name="descrizione" placeholder="Descrizione" <?php echo 'value="'.$test["descrizione"].'"';  ?>>
                     </div>
                 </div>
             </div>
 
             <div class="domande-container">
-                
+                <?php foreach ($domande as $index => $domanda): ?>
+                    <div class="border p-3 mt-3">
+                        <input type="hidden" name="tipo[]" value="<?php echo $domanda['tipo']; ?>">
+                        <div class="form-group">
+                            <label for="domanda_<?php echo $index; ?>" class="d-flex justify-content-between">
+                                <h5>Domanda <?php echo $index + 1; ?></h5>
+                                <button type="button" class="btn btn-danger delete-question mb-2"><i class="bi bi-x-lg"></i></button>
+                            </label>
+                            <input type="text" class="form-control" name="<?php echo $domanda['tipo']; ?>[]" value="<?php echo htmlspecialchars($domanda['testo']); ?>" placeholder="Scrivi domanda">
+                        </div>
+                        
+                        <?php if ($domanda['tipo'] === 'multipla'): ?>
+                            <div class="form-group mt-2">
+                                <label>Opzioni</label>
+                                <?php foreach ($grouped_options[$domanda['id']] as $i => $opzione): ?>
+                                    <input type="text" class="form-control mb-2" name="opzioni[<?php echo $index; ?>][<?php echo $i; ?>]" value="<?php echo htmlspecialchars($opzione['testo']); ?>" placeholder="Opzione <?php echo $i + 1; ?>">
+                                <?php endforeach; ?>
+                            </div>
+                            <div class="form-group mt-2">
+                                <label for="risposta">Risposta corretta</label>
+                                <select class="form-select" name="rispostaCorretta[<?php echo $index; ?>]">
+                                    <?php foreach ($grouped_options[$domanda['id']] as $i => $opzione): ?>
+                                        <option value="<?php echo $i + 1; ?>" <?php echo $opzione['corretta'] ? 'selected' : ''; ?>>
+                                            <?php echo $i + 1; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
             </div>
 
             <div class="ms-auto">
                 <button class="btn btn-success my-auto" id="salva_test" name="salva_test"><i class="bi bi-floppy me-2"></i>Salva Test</button>
             </div>
+
         </form>
 
         <div class="d-flex justify-content-center gap-3">
@@ -129,18 +146,22 @@
             </select>
             <button class="btn btn-success my-auto" id="aggiungi-domanda"><i class="bi bi-plus-lg"></i></button>
         </div>
-
     </div>
 
     <script>
 
         let nDom = 1;
         let nMultipla = 0;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            nDom = document.querySelectorAll('.domande-container .border').length + 1;
+            nMultipla = document.querySelectorAll('input[name="tipo[]"][value="multipla"]').length + 1;
+        });
+
         
         document.getElementById('aggiungi-domanda').addEventListener('click', function (event) {
             event.preventDefault(); // Prevent form submission or page reload
 
-            // Create a new question container
             const questionContainer = document.createElement('div');
             questionContainer.classList.add('border', 'p-3', 'mt-3');
 
