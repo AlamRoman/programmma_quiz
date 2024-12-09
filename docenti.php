@@ -84,7 +84,7 @@
                         echo '</div>';
                         echo '<div class="my-auto d-flex gap-3">';
                         echo '<a href="#" class="btn btn-danger" onclick="return confirmDelete(' . $row['id'] . ')"><i class="bi bi-trash"></i></a>';
-                        echo '<button class="btn btn-secondary"><i class="bi bi-pencil-square"></i></button>';
+                        echo '<a class="btn btn-secondary" href="modificaTest.php?id_test='.$row["id"].'"><i class="bi bi-pencil-square"></i></a>';
                         echo '</div>';
                         echo '</li>';
                     }
