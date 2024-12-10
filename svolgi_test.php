@@ -78,6 +78,15 @@
         </div>
     </nav>
 
+    <div class="ms-5 mt-3">
+    <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="studenti.php">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Svolgi test</li>
+    </ol>
+    </nav>
+    </div>
+
     <div class="mt-3">
 
         <h2 class="fw-bold text-center my-5"><?php echo $test["titolo"] ?></h2>

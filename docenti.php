@@ -79,9 +79,8 @@
                 <button class="btn btn-success my-auto"><i class="bi bi-plus-lg"></i></button>
             </a>
         </div>
-        <hr>
         <div>
-            <ul class="list-group">
+            <ul class="list-group p-1" style="background-color: #f0f0f0;">
             <?php
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {

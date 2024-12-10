@@ -41,11 +41,18 @@
         </div>
     </nav>
 
+    <div class="ms-5 mt-3">
+    <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">Home</li>
+    </ol>
+    </nav>
+    </div>
+
     <div class="container mt-5">
-        <h3 class="my-3">Test Svolto</h3>
-        <hr>
+        <h3 class="my-3">Lista Test</h3>
         <div>
-            <ul class="list-group">
+            <ul class="list-group p-1" style="background-color: #f0f0f0;">
                 <?php
                     if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
@@ -54,7 +61,7 @@
                             echo '<h6>' . htmlspecialchars($row['titolo']) . '</h6>';
                             echo '<p>' . htmlspecialchars($row['descrizione']) . '</p>';
                             echo '</div>';
-                            echo '<div class="my-auto d-flex gap-2"><a href="riepilogo.php?id_test='.$row["id"].'" class="btn btn-warning"><i class="bi bi-eye"></i> Riepilogo</a>';
+                            echo '<div class="my-auto d-flex gap-2"><a href="riepilogo.php?id_test='.$row["id"].'" class="btn btn-info"><i class="bi bi-eye"></i> Riepilogo</a>';
                             echo '<a href="svolgi_test.php?id_test='.$row["id"].'" class="btn btn-success"><i class="bi bi-journal-text"></i> Svolgi</a></div>';
                             echo '</li>';
                         }
