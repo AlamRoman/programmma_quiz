@@ -46,7 +46,8 @@
                 $domanda_id = $stmt->insert_id; // Get the last inserted question ID
     
                 // inserisci riposte
-                foreach ($opzioni[$mIndex] as $key => $risposta) {
+                $op = $opzioni[$mIndex] ?? [[1=>""],[2=>""],[3=>""],[4=>""]];
+                foreach ($op as $key => $risposta) {
                     $isCorrect = ($key + 1 == $risposteCorrette[$mIndex]) ? 1 : 0;
                     $sql = "INSERT INTO risposta (id_domanda, testo, corretta) VALUES (?, ?, ?)";
                     $stmt = $conn->prepare($sql);

@@ -9,8 +9,94 @@
         go_to("login_page.php");
     }
 
+    $id_test=null;
+
     if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["id_test"])){
         $id_test = $_GET["id_test"];
+
+    }else if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["salva_modifiche"])){
+
+        try {
+            $id_test = $_POST["id_test"];
+
+            $titolo = $_POST['titolo'];
+            $descrizione = $_POST['descrizione'];
+
+            // aggiorna i dati del test
+            $sql_update_test = "UPDATE test SET titolo = ?, descrizione = ? WHERE id = ?";
+            $stmt = $conn->prepare($sql_update_test);
+            $stmt->bind_param("ssi", $titolo, $descrizione, $id_test);
+            $stmt->execute();
+
+            //id delle domande presenti nel test
+            $sql = "SELECT id FROM domanda WHERE id_test = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $id_test);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $existing_question_ids = $result->fetch_all(MYSQLI_ASSOC);
+
+            //id delle domande nel form
+            $submitted_ids = $_POST['domanda_ids'] ?? [];
+            
+            $existing_ids = array_column($existing_question_ids, 'id');
+            $to_delete = array_diff($existing_ids, $submitted_ids);
+
+            if (!empty($to_delete)) {
+                $placeholders = implode(',', array_fill(0, count($to_delete), '?'));
+                $sql_delete_questions = "DELETE FROM domanda WHERE id IN ($placeholders)";
+                $stmt_delete = $conn->prepare($sql_delete_questions);
+                $stmt_delete->bind_param(str_repeat('i', count($to_delete)), ...$to_delete);
+                $stmt_delete->execute();
+            }
+
+            foreach ($_POST['tipo'] as $index => $tipo) {
+                $question_id = $submitted_ids[$index] ?? null;
+                $testo = $_POST["testo"][$index];
+        
+                if ($question_id) {
+                    //aggiorna domanda
+                    $sql_update_question = "UPDATE domanda SET testo = ?, tipo = ? WHERE id = ?";
+                    $stmt_update_question = $conn->prepare($sql_update_question);
+                    $stmt_update_question->bind_param("ssi", $testo, $tipo, $question_id);
+                    $stmt_update_question->execute();
+                } else {
+                    //inserisci nuova domanda
+                    $sql_insert_question = "INSERT INTO domanda (id_test, testo, tipo) VALUES (?, ?, ?)";
+                    $stmt_insert_question = $conn->prepare($sql_insert_question);
+                    $stmt_insert_question->bind_param("iss", $id_test, $testo, $tipo);
+                    $stmt_insert_question->execute();
+                    $question_id = $conn->insert_id;
+                }
+        
+                //aggiorna risposte delle domande multipla
+                if ($tipo === 'multipla') {
+                    //cancella la risposta vecchia
+                    $sql_delete_options = "DELETE FROM risposta WHERE id_domanda = ?";
+                    $stmt_delete_options = $conn->prepare($sql_delete_options);
+                    $stmt_delete_options->bind_param("i", $question_id);
+                    $stmt_delete_options->execute();
+        
+                    //aggiungi nuova risposta
+                    $op = $_POST['opzioni'][$index] ?? [[1=>""],[2=>""],[3=>""],[4=>""]];
+                    foreach ($op as $option_index => $option_text) {
+
+                        $is_correct = ($_POST['rispostaCorretta'][$index] == $option_index + 1) ? 1 : 0;
+                        $sql_insert_option = "INSERT INTO risposta (id_domanda, testo, corretta) VALUES (?, ?, ?)";
+                        $stmt_insert_option = $conn->prepare($sql_insert_option);
+                        $stmt_insert_option->bind_param("isi", $question_id, $option_text, $is_correct);
+                        $stmt_insert_option->execute();
+                    }
+                }
+            }
+
+            $_SESSION["testModificato"]=1;
+            go_to("docenti.php");
+        } catch (\Throwable $th) {
+            $_SESSION["testModificato"]=0;
+            go_to("docenti.php?testModificato=0");
+        }
+
     }else{
         go_to("docenti.php");
         exit();
@@ -90,6 +176,7 @@
             <div class="border p-3">
                 <h3>Dati test</h3>
                 <div class="d-flex gap-5 mt-3">
+                    <input type="hidden" name="id_test" value="<?php echo $id_test; ?>">
                     <div>
                         <input class="form-control" type="text" id="titolo" name="titolo" placeholder="Nome del test" required <?php echo 'value="'.$test["titolo"].'"';  ?>>
                     </div>
@@ -102,13 +189,14 @@
             <div class="domande-container">
                 <?php foreach ($domande as $index => $domanda): ?>
                     <div class="border p-3 mt-3">
+                        <input type="hidden" name="domanda_ids[]" value="<?php echo $domanda['id']; ?>">
                         <input type="hidden" name="tipo[]" value="<?php echo $domanda['tipo']; ?>">
                         <div class="form-group">
                             <label for="domanda_<?php echo $index; ?>" class="d-flex justify-content-between">
                                 <h5>Domanda <?php echo $index + 1; ?></h5>
                                 <button type="button" class="btn btn-danger delete-question mb-2"><i class="bi bi-x-lg"></i></button>
                             </label>
-                            <input type="text" class="form-control" name="<?php echo $domanda['tipo']; ?>[]" value="<?php echo htmlspecialchars($domanda['testo']); ?>" placeholder="Scrivi domanda">
+                            <input type="text" class="form-control" name="testo[]" value="<?php echo htmlspecialchars($domanda['testo']); ?>" placeholder="Scrivi domanda">
                         </div>
                         
                         <?php if ($domanda['tipo'] === 'multipla'): ?>
@@ -134,7 +222,7 @@
             </div>
 
             <div class="ms-auto">
-                <button class="btn btn-success my-auto" id="salva_test" name="salva_test"><i class="bi bi-floppy me-2"></i>Salva Test</button>
+                <button class="btn btn-success my-auto" id="salva_modifiche" name="salva_modifiche"><i class="bi bi-floppy me-2"></i>Salva modifiche</button>
             </div>
 
         </form>
@@ -170,37 +258,39 @@
             if (tipoDomanda === 'aperta') {
                 // domanda aperta
                 questionContainer.innerHTML = `
+                    <input type="hidden" name="domanda_ids[]" value="">
                     <input type="hidden" name="tipo[]" value="aperta">
                     <div class="form-group">
                         <label for="aperta" class="d-flex justify-content-between">
                             <h5>Domanda ${nDom}</h5>
                             <button type="button" class="btn btn-danger delete-question mb-2"><i class="bi bi-x-lg"></i></button>
                         </label>
-                        <input type="text" class="form-control" name="aperta[]" placeholder="Scrivi domanda">
+                        <input type="text" class="form-control" name="testo[]" placeholder="Scrivi domanda">
                     </div>
                 `;
                 nDom++;
             } else if (tipoDomanda === 'multipla') {
                 // domanda a risposta multipla
                 questionContainer.innerHTML = `
+                    <input type="hidden" name="domanda_ids[]" value="">
                     <input type="hidden" name="tipo[]" value="multipla">
                     <div class="form-group">
                         <label for="aperta" class="d-flex justify-content-between">
                             <h5>Domanda ${nDom}</h5>
                             <button type="button" class="btn btn-danger delete-question mb-2"><i class="bi bi-x-lg"></i></button>
                         </label>
-                        <input type="text" class="form-control" name="multipla[]" placeholder="Inserisci domanda">
+                        <input type="text" class="form-control" name="testo[]" placeholder="Inserisci domanda">
                     </div>
                     <div class="form-group mt-2">
                         <label>Opzioni</label>
-                        <input type="text" class="form-control mb-2" name="opzioni[${nMultipla}][0]" placeholder="Opzione 1">
-                        <input type="text" class="form-control mb-2" name="opzioni[${nMultipla}][1]" placeholder="Opzione 2">
-                        <input type="text" class="form-control mb-2" name="opzioni[${nMultipla}][2]" placeholder="Opzione 3">
-                        <input type="text" class="form-control mb-2" name="opzioni[${nMultipla}][3]" placeholder="Opzione 4">
+                        <input type="text" class="form-control mb-2" name="opzioni[${nDom-1}][0]" placeholder="Opzione 1">
+                        <input type="text" class="form-control mb-2" name="opzioni[${nDom-1}][1]" placeholder="Opzione 2">
+                        <input type="text" class="form-control mb-2" name="opzioni[${nDom-1}][2]" placeholder="Opzione 3">
+                        <input type="text" class="form-control mb-2" name="opzioni[${nDom-1}][3]" placeholder="Opzione 4">
                     </div>
                     <div class="form-group mt-2">
                         <label for="risposta">Risposta corretta</label>
-                        <select class="form-select" name="rispostaCorretta[]" id="risposta">
+                        <select class="form-select" name="rispostaCorretta[${nDom-1}]" id="risposta">
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -215,16 +305,13 @@
             document.querySelector('.domande-container').appendChild(questionContainer);
         });
 
+
         document.querySelector('.domande-container').addEventListener('click', function (event) {
             if (event.target.classList.contains('delete-question') || event.target.closest('.delete-question')) {
                 const questionElement = event.target.closest('.border');
                 
-                if (questionElement.querySelector('input[name="tipo[]"][value="aperta"]')) {
-                    nDom--;
-                } else if (questionElement.querySelector('input[name="tipo[]"][value="multipla"]')) {
-                    nDom--;
-                    nMultipla--;
-                }
+                // Decrement nDom for any question removed
+                nDom--;
 
                 questionElement.remove();
 
@@ -232,34 +319,32 @@
             }
         });
 
-        //aggiorna domande quando viene eliminato una domanda
+        // Update question labels and options
         function updateQuestionLabelsAndOptions() {
             const questions = document.querySelectorAll('.domande-container .border');
-            let questionNumber = 1;
-            let multipleChoiceIndex = 0;
+            
+            let questionNumber = 0;
 
             questions.forEach((question) => {
                 const label = question.querySelector('label');
                 if (label) {
-                    label.innerHTML = `<h5>Domanda ${questionNumber}<h5>`;
                     questionNumber++;
+                    label.innerHTML = `<h5>Domanda ${questionNumber}</h5>`;
                 }
 
-                if (question.querySelector('input[name="tipo[]"][value="multipla"]')) {
-                    const options = question.querySelectorAll('input[name^="opzioni"]');
-                    options.forEach((option, index) => {
-                        option.name = `opzioni[${multipleChoiceIndex}][${index}]`;
-                    });
+                const options = question.querySelectorAll('input[name^="opzioni"]');
+                options.forEach((option, index) => {
+                    option.name = `opzioni[${questionNumber-1}][${index}]`;
+                });
 
-                    const correctAnswerSelect = question.querySelector('select[name^="rispostaCorretta"]');
-                    if (correctAnswerSelect) {
-                        correctAnswerSelect.name = `rispostaCorretta[${multipleChoiceIndex}]`;
-                    }
-
-                    multipleChoiceIndex++;
+                const correctAnswerSelect = question.querySelector('select[name^="rispostaCorretta"]');
+                if (correctAnswerSelect) {
+                    correctAnswerSelect.name = `rispostaCorretta[${questionNumber-1}]`;
                 }
+
             });
         }
+
 
     </script>
 

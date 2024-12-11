@@ -56,6 +56,23 @@
                 </div></div>';
         }
 
+        if(isset($_SESSION["testModificato"])){
+
+            if($_SESSION["testModificato"]==1){
+                echo '<div class="container mt-5"><div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill"></i> Test modificato correttamente !
+                    <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+                </div></div>';
+            }else{
+                echo '<div class="container mt-5"><div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-x-circle-fill"></i> Errore durante la modifica del test
+                        <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+                    </div></div>';
+            }
+            
+            unset($_SESSION["testModificato"]);
+        }
+
         if (isset($_GET["deleted"])) {
             if ($_GET["deleted"] == 1) {
                 echo '<div class="container mt-5"><div class="alert alert-success alert-dismissible fade show" role="alert">
