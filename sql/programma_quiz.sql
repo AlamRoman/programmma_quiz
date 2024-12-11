@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 08, 2024 at 06:36 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Generation Time: Dec 11, 2024 at 12:38 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `classe`
 --
 
-CREATE TABLE IF NOT EXISTS `classe` (
+CREATE TABLE `classe` (
   `codice` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `classe` (
 -- Table structure for table `domanda`
 --
 
-CREATE TABLE IF NOT EXISTS `domanda` (
+CREATE TABLE `domanda` (
   `id` int(11) NOT NULL,
   `testo` varchar(2000) NOT NULL,
   `tipo` enum('multipla','aperta') DEFAULT NULL,
@@ -64,7 +64,7 @@ INSERT INTO `domanda` (`id`, `testo`, `tipo`, `id_test`) VALUES
 -- Table structure for table `risposta`
 --
 
-CREATE TABLE IF NOT EXISTS `risposta` (
+CREATE TABLE `risposta` (
   `id` int(11) NOT NULL,
   `testo` varchar(2000) DEFAULT NULL,
   `corretta` tinyint(1) NOT NULL,
@@ -83,7 +83,7 @@ INSERT INTO `risposta` (`id`, `testo`, `corretta`, `id_domanda`) VALUES
 (29, 'Connettere due tabelle', 0, 2),
 (30, 'Ordinare i dati in una tabella', 0, 2),
 (31, 'Identificare univocamente ogni riga di una tabella', 1, 2),
-(32, "Limitare l'accesso ai dati", 0, 2),
+(32, 'Limitare l\'accesso ai dati', 0, 2),
 (33, 'ALTER TABLE', 1, 3),
 (34, 'UPDATE', 0, 3),
 (35, 'CREATE TABLE', 0, 3),
@@ -96,10 +96,24 @@ INSERT INTO `risposta` (`id`, `testo`, `corretta`, `id_domanda`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `risposte_date`
+--
+
+CREATE TABLE `risposte_date` (
+  `id_test` int(11) NOT NULL,
+  `id_user` int(11) NOT NULL,
+  `id_domanda` int(11) NOT NULL,
+  `tipologia_domanda` enum('multipla','aperta') NOT NULL,
+  `risposta_data` varchar(2000) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `risultati`
 --
 
-CREATE TABLE IF NOT EXISTS `risultati` (
+CREATE TABLE `risultati` (
   `id` int(11) NOT NULL,
   `id_studente` int(11) NOT NULL,
   `id_test` int(11) NOT NULL,
@@ -112,7 +126,7 @@ CREATE TABLE IF NOT EXISTS `risultati` (
 -- Table structure for table `ruolo`
 --
 
-CREATE TABLE IF NOT EXISTS `ruolo` (
+CREATE TABLE `ruolo` (
   `id` int(11) NOT NULL,
   `ruolo` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -132,7 +146,7 @@ INSERT INTO `ruolo` (`id`, `ruolo`) VALUES
 -- Table structure for table `ruolo_users`
 --
 
-CREATE TABLE IF NOT EXISTS `ruolo_users` (
+CREATE TABLE `ruolo_users` (
   `id_ruolo` int(11) NOT NULL,
   `id_user` int(11) NOT NULL,
   `ruolo` varchar(255) DEFAULT NULL
@@ -153,7 +167,7 @@ INSERT INTO `ruolo_users` (`id_ruolo`, `id_user`, `ruolo`) VALUES
 -- Table structure for table `sessione_test`
 --
 
-CREATE TABLE IF NOT EXISTS `sessione_test` (
+CREATE TABLE `sessione_test` (
   `id` int(11) NOT NULL,
   `id_test` int(11) NOT NULL,
   `codice_classe` varchar(25) NOT NULL
@@ -165,7 +179,7 @@ CREATE TABLE IF NOT EXISTS `sessione_test` (
 -- Table structure for table `test`
 --
 
-CREATE TABLE IF NOT EXISTS `test` (
+CREATE TABLE `test` (
   `id` int(11) NOT NULL,
   `titolo` varchar(255) NOT NULL,
   `descrizione` text DEFAULT NULL
@@ -185,7 +199,7 @@ INSERT INTO `test` (`id`, `titolo`, `descrizione`) VALUES
 -- Table structure for table `users`
 --
 
-CREATE TABLE IF NOT EXISTS `users` (
+CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
@@ -225,6 +239,14 @@ ALTER TABLE `domanda`
 --
 ALTER TABLE `risposta`
   ADD PRIMARY KEY (`id`),
+  ADD KEY `id_domanda` (`id_domanda`);
+
+--
+-- Indexes for table `risposte_date`
+--
+ALTER TABLE `risposte_date`
+  ADD PRIMARY KEY (`id_test`,`id_user`,`id_domanda`),
+  ADD KEY `id_user` (`id_user`),
   ADD KEY `id_domanda` (`id_domanda`);
 
 --
@@ -332,6 +354,14 @@ ALTER TABLE `domanda`
 --
 ALTER TABLE `risposta`
   ADD CONSTRAINT `fk_risposta_domanda` FOREIGN KEY (`id_domanda`) REFERENCES `domanda` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `risposte_date`
+--
+ALTER TABLE `risposte_date`
+  ADD CONSTRAINT `risposte_date_ibfk_1` FOREIGN KEY (`id_test`) REFERENCES `test` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `risposte_date_ibfk_2` FOREIGN KEY (`id_user`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `risposte_date_ibfk_3` FOREIGN KEY (`id_domanda`) REFERENCES `domanda` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `risultati`
