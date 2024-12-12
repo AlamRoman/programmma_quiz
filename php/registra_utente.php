@@ -17,9 +17,7 @@
         $row = mysqli_num_rows($result);
 
         if ($row > 0) {
-
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
+            
             try {
 
                 $sql = 'SELECT * FROM users WHERE username=?';
@@ -30,6 +28,12 @@
                 $user = $result->fetch_assoc();
 
                 $user_id = $user["id"];
+
+                if($password == $user["password"]){
+                    $hashed_password = $password;
+                }else{
+                    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                }
 
                 $sql = 'UPDATE users SET username=?,password=?,email=?,first_name=?,last_name=? WHERE id=?;';
                 $stmt = $conn->prepare($sql);
