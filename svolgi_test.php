@@ -131,7 +131,7 @@
                     echo "</div></div>";
                 }
             ?>
-            <input type="submit" name="invia" class="btn btn-primary float-right mt-3 mb-5" value="Termina test">
+            <input type="submit" name="invia" class="btn btn-primary float-right my-5" value="Termina test">
         </form>
     </div>
 

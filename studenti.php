@@ -49,6 +49,27 @@
 	</nav>
 	</div>
 
+	<?php 
+
+		if(isset($_SESSION["testSvolto"])){
+
+			if($_SESSION["testSvolto"]==1){
+				echo '<div class="container mt-5"><div class="alert alert-success alert-dismissible fade show" role="alert">
+					<i class="bi bi-check-circle-fill"></i> Test svolto, tutte le risposte salvate correttamente!
+					<button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+				</div></div>';
+			}else{
+				echo '<div class="container mt-5"><div class="alert alert-danger alert-dismissible fade show" role="alert">
+						<i class="bi bi-x-circle-fill"></i> Errore durante il salvataggio delle risposte!
+						<button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+					</div></div>';
+			}
+			
+			unset($_SESSION["testSvolto"]);
+		}
+
+	?>
+
 	<div class="container mt-5">
 		<h3 class="my-3">Lista Test</h3>
 		<div>
