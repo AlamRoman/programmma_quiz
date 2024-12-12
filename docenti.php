@@ -9,8 +9,11 @@
         go_to("login_page.php");
     }
 
-    $sql = "SELECT id, titolo, descrizione FROM test";
-    $result = $conn->query($sql);
+    $sql = "SELECT id, titolo, descrizione FROM test WHERE creato_da = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $_SESSION["user_id"]);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
 ?>
 

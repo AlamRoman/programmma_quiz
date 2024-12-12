@@ -20,9 +20,9 @@
         $risposteCorrette = $_POST['rispostaCorretta'] ?? [];
 
         //crea il test
-        $sql = "INSERT INTO test (titolo, descrizione) VALUES (?, ?)";
+        $sql = "INSERT INTO test (titolo, descrizione,creato_da) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $titolo, $descrizione);
+        $stmt->bind_param("sss", $titolo, $descrizione, $_SESSION["user_id"]);
         $stmt->execute();
         $test_id = $stmt->insert_id;
 

@@ -73,7 +73,7 @@
         foreach ($user as $i => $data) {
 
             if($i==="id"){
-                $table .= '<td><a href="'.$_SERVER['PHP_SELF'].'?update='.$user["id"].'"><button class="btn btn-secondary">'.$data.'</button></a></td>';
+                $table .= '<td><a href="'.$_SERVER['PHP_SELF'].'?update='.$user["id"].'"><button class="btn btn-secondary w-100">'.$data.'</button></a></td>';
             }else if($i==="password"){
                 $table .= "<td style=\"max-width:100px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;\">$data</td>";
             }else{

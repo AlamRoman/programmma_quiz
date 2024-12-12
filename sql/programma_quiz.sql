@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 11, 2024 at 12:38 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Generation Time: Dec 12, 2024 at 12:54 PM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -56,7 +56,17 @@ INSERT INTO `domanda` (`id`, `testo`, `tipo`, `id_test`) VALUES
 (5, 'Qual è il comando per inserire un nuovo record in SQL?', 'aperta', 1),
 (6, 'Cosa fa il comando DELETE in SQL?', 'aperta', 1),
 (8, 'come ti chiami?', 'aperta', 4),
-(9, 'Scegli il numero piu grande', 'multipla', 4);
+(9, 'Scegli il numero piu grande', 'multipla', 4),
+(14, 'When did last time Messi win the world cup?', 'aperta', 9),
+(15, 'How many goals did Mbappe do in the 2022 world cup final?', 'multipla', 9),
+(16, 'How many world cup does Argentina has?', 'aperta', 9),
+(17, 'Which country has most world cup? And how many?', 'aperta', 9),
+(18, 'Which country defeated Portugal in the 2022 world cup quarter final?', 'multipla', 9),
+(19, 'come ti chiami?', 'aperta', 10),
+(20, 'ciao albero', 'multipla', 10),
+(27, 'una domanda strana', 'aperta', 10),
+(61, 'conta', 'multipla', 10),
+(62, 'nuova domanda', 'aperta', 11);
 
 -- --------------------------------------------------------
 
@@ -83,15 +93,31 @@ INSERT INTO `risposta` (`id`, `testo`, `corretta`, `id_domanda`) VALUES
 (29, 'Connettere due tabelle', 0, 2),
 (30, 'Ordinare i dati in una tabella', 0, 2),
 (31, 'Identificare univocamente ogni riga di una tabella', 1, 2),
-(32, "Limitare l'accesso ai dati", 0, 2),
+(32, 'Limitare l\'accesso ai dati', 0, 2),
 (33, 'ALTER TABLE', 1, 3),
 (34, 'UPDATE', 0, 3),
-(35, 'CREATE TABLE IF NOT EXISTS', 0, 3),
+(35, 'CREATE TABLE', 0, 3),
 (36, 'ADD COLUMN', 0, 3),
 (37, '1', 0, 9),
 (38, '5', 1, 9),
 (39, '2', 0, 9),
-(40, '3', 0, 9);
+(40, '3', 0, 9),
+(41, '1', 0, 15),
+(42, '4', 0, 15),
+(43, '2', 0, 15),
+(44, '3', 1, 15),
+(45, 'Brazil', 0, 18),
+(46, 'Morocco', 1, 18),
+(47, 'Croatia', 0, 18),
+(48, 'Argentina', 0, 18),
+(477, 'lool', 0, 20),
+(478, 'lol', 0, 20),
+(479, 'ala', 0, 20),
+(480, 'lal', 1, 20),
+(481, '123', 1, 61),
+(482, '12', 0, 61),
+(483, '23132', 0, 61),
+(484, '34', 0, 61);
 
 -- --------------------------------------------------------
 
@@ -106,6 +132,18 @@ CREATE TABLE IF NOT EXISTS `risposte_date` (
   `tipologia_domanda` enum('multipla','aperta') NOT NULL,
   `risposta_data` varchar(2000) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `risposte_date`
+--
+
+INSERT INTO IF NOT EXISTS `risposte_date` (`id_test`, `id_user`, `id_domanda`, `tipologia_domanda`, `risposta_data`) VALUES
+(4, 1, 8, 'aperta', 'mario'),
+(4, 1, 9, 'multipla', '3'),
+(10, 1, 19, 'aperta', 'albero\r\nciao\r\nvolo\r\nlol\r\nha'),
+(10, 1, 20, 'multipla', '2'),
+(10, 1, 27, 'aperta', 'stranna'),
+(10, 1, 61, 'multipla', '3');
 
 -- --------------------------------------------------------
 
@@ -156,9 +194,10 @@ CREATE TABLE IF NOT EXISTS `ruolo_users` (
 -- Dumping data for table `ruolo_users`
 --
 
-INSERT INTO `ruolo_users` (`id_ruolo`, `id_user`, `ruolo`) VALUES
+INSERT INTO IF NOT EXISTS `ruolo_users` (`id_ruolo`, `id_user`, `ruolo`) VALUES
 (1, 2, 'admin'),
 (3, 3, 'docente'),
+(3, 4, 'docente'),
 (2, 1, 'studente');
 
 -- --------------------------------------------------------
@@ -182,16 +221,20 @@ CREATE TABLE IF NOT EXISTS `sessione_test` (
 CREATE TABLE IF NOT EXISTS `test` (
   `id` int(11) NOT NULL,
   `titolo` varchar(255) NOT NULL,
-  `descrizione` text DEFAULT NULL
+  `descrizione` text DEFAULT NULL,
+  `creato_da` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `test`
 --
 
-INSERT INTO `test` (`id`, `titolo`, `descrizione`) VALUES
-(1, 'Test di Informatica', 'quiz sui database'),
-(4, 'Test matematica', 'numeri');
+INSERT INTO `test` (`id`, `titolo`, `descrizione`, `creato_da`) VALUES
+(1, 'Test di Informatica', 'quiz sui database', 3),
+(4, 'Test matematica', 'numeri', 3),
+(9, 'English final test 2024 world cup', 'Good luck for the test', 3),
+(10, 'test modifiche', 'modifica', 3),
+(11, 'test 1', 'creato da docente 2', 4);
 
 -- --------------------------------------------------------
 
@@ -213,9 +256,10 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `first_name`, `last_name`, `email`) VALUES
-(1, 'mario', '$2y$10$IsCaTcJ.d.uzJyMCIoNnOeQqDfIxTseeeDtV.J0bFsIVqmFYqB12O', 'Mario', 'Rossi', NULL),
-(2, 'admin', '$2y$10$IsCaTcJ.d.uzJyMCIoNnOeQqDfIxTseeeDtV.J0bFsIVqmFYqB12O', NULL, NULL, NULL),
-(3, 'luigi', '$2y$10$svasPPTUr7JunweMkDlF2.NsMIHQwEnxycjBkSz0rPGaAjo.hxSf6', 'Luigi', 'Biangi', 'luigi@test.com');
+(1, 'mario', '$2y$10$qjmd5gOWhllP3aznOrabBOvY0OWGgFQIKk3oPqMvdkcwLy.AT20IS', 'Mario', 'Rossi', 'mario.rossi@gmail.it'),
+(2, 'admin', '$2y$10$IsCaTcJ.d.uzJyMCIoNnOeQqDfIxTseeeDtV.J0bFsIVqmFYqB12O', 'Admin', 'Admin', ''),
+(3, 'luigi', '$2y$10$svasPPTUr7JunweMkDlF2.NsMIHQwEnxycjBkSz0rPGaAjo.hxSf6', 'Luigi', 'Biangi', 'luigi@test.com'),
+(4, 'marco', '$2y$10$.aF1NVpN.AKWngYeCRIlK.h.F9L9.zmzHstUAywLLClCFgu3HKiam', '', '', '');
 
 --
 -- Indexes for dumped tables
@@ -284,7 +328,8 @@ ALTER TABLE `sessione_test`
 -- Indexes for table `test`
 --
 ALTER TABLE `test`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_creato_da` (`creato_da`);
 
 --
 -- Indexes for table `users`
@@ -301,13 +346,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `domanda`
 --
 ALTER TABLE `domanda`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT for table `risposta`
 --
 ALTER TABLE `risposta`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=485;
 
 --
 -- AUTO_INCREMENT for table `risultati`
@@ -331,13 +376,13 @@ ALTER TABLE `sessione_test`
 -- AUTO_INCREMENT for table `test`
 --
 ALTER TABLE `test`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables
@@ -384,6 +429,12 @@ ALTER TABLE `ruolo_users`
 ALTER TABLE `sessione_test`
   ADD CONSTRAINT `sessione_test_ibfk_1` FOREIGN KEY (`id_test`) REFERENCES `test` (`id`),
   ADD CONSTRAINT `sessione_test_ibfk_2` FOREIGN KEY (`codice_classe`) REFERENCES `classe` (`codice`);
+
+--
+-- Constraints for table `test`
+--
+ALTER TABLE `test`
+  ADD CONSTRAINT `fk_creato_da` FOREIGN KEY (`creato_da`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
