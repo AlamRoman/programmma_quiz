@@ -73,7 +73,7 @@
 							echo '<div class="my-auto d-flex gap-2">';
 							if ($has_data) {
 								echo '<a href="riepilogo.php?id_test='.$row["id"].'" class="btn btn-info"><i class="bi bi-eye"></i> Riepilogo</a>';
-								echo '<button class="btn btn-success" style="background-color:#968887; border:none;" disabled><i class="bi bi-journal-text"></i> Svolgi</button>';
+								echo '<button class="btn btn-success" style="background-color:#968887; border:none; color: #000;" disabled><i class="bi bi-journal-text"></i> Svolgi</button>';
 							} else {
 								echo '<button class="btn btn-info" style="background-color:#968887; border:none;" disabled><i class="bi bi-eye"></i> Riepilogo</button>';
 								echo '<a href="svolgi_test.php?id_test='.$row["id"].'" class="btn btn-success"><i class="bi bi-journal-text"></i> Svolgi</a>';
