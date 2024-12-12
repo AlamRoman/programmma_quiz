@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `classe`
 --
 
-CREATE TABLE `classe` (
+CREATE TABLE IF NOT EXISTS `classe` (
   `codice` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -37,7 +37,7 @@ CREATE TABLE `classe` (
 -- Table structure for table `domanda`
 --
 
-CREATE TABLE `domanda` (
+CREATE TABLE IF NOT EXISTS `domanda` (
   `id` int(11) NOT NULL,
   `testo` varchar(2000) NOT NULL,
   `tipo` enum('multipla','aperta') DEFAULT NULL,
@@ -64,7 +64,7 @@ INSERT INTO `domanda` (`id`, `testo`, `tipo`, `id_test`) VALUES
 -- Table structure for table `risposta`
 --
 
-CREATE TABLE `risposta` (
+CREATE TABLE IF NOT EXISTS `risposta` (
   `id` int(11) NOT NULL,
   `testo` varchar(2000) DEFAULT NULL,
   `corretta` tinyint(1) NOT NULL,
@@ -86,7 +86,7 @@ INSERT INTO `risposta` (`id`, `testo`, `corretta`, `id_domanda`) VALUES
 (32, "Limitare l'accesso ai dati", 0, 2),
 (33, 'ALTER TABLE', 1, 3),
 (34, 'UPDATE', 0, 3),
-(35, 'CREATE TABLE', 0, 3),
+(35, 'CREATE TABLE IF NOT EXISTS', 0, 3),
 (36, 'ADD COLUMN', 0, 3),
 (37, '1', 0, 9),
 (38, '5', 1, 9),
@@ -99,7 +99,7 @@ INSERT INTO `risposta` (`id`, `testo`, `corretta`, `id_domanda`) VALUES
 -- Table structure for table `risposte_date`
 --
 
-CREATE TABLE `risposte_date` (
+CREATE TABLE IF NOT EXISTS `risposte_date` (
   `id_test` int(11) NOT NULL,
   `id_user` int(11) NOT NULL,
   `id_domanda` int(11) NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE `risposte_date` (
 -- Table structure for table `risultati`
 --
 
-CREATE TABLE `risultati` (
+CREATE TABLE IF NOT EXISTS `risultati` (
   `id` int(11) NOT NULL,
   `id_studente` int(11) NOT NULL,
   `id_test` int(11) NOT NULL,
@@ -126,7 +126,7 @@ CREATE TABLE `risultati` (
 -- Table structure for table `ruolo`
 --
 
-CREATE TABLE `ruolo` (
+CREATE TABLE IF NOT EXISTS `ruolo` (
   `id` int(11) NOT NULL,
   `ruolo` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -146,7 +146,7 @@ INSERT INTO `ruolo` (`id`, `ruolo`) VALUES
 -- Table structure for table `ruolo_users`
 --
 
-CREATE TABLE `ruolo_users` (
+CREATE TABLE IF NOT EXISTS `ruolo_users` (
   `id_ruolo` int(11) NOT NULL,
   `id_user` int(11) NOT NULL,
   `ruolo` varchar(255) DEFAULT NULL
@@ -167,7 +167,7 @@ INSERT INTO `ruolo_users` (`id_ruolo`, `id_user`, `ruolo`) VALUES
 -- Table structure for table `sessione_test`
 --
 
-CREATE TABLE `sessione_test` (
+CREATE TABLE IF NOT EXISTS `sessione_test` (
   `id` int(11) NOT NULL,
   `id_test` int(11) NOT NULL,
   `codice_classe` varchar(25) NOT NULL
@@ -179,7 +179,7 @@ CREATE TABLE `sessione_test` (
 -- Table structure for table `test`
 --
 
-CREATE TABLE `test` (
+CREATE TABLE IF NOT EXISTS `test` (
   `id` int(11) NOT NULL,
   `titolo` varchar(255) NOT NULL,
   `descrizione` text DEFAULT NULL
@@ -199,7 +199,7 @@ INSERT INTO `test` (`id`, `titolo`, `descrizione`) VALUES
 -- Table structure for table `users`
 --
 
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
