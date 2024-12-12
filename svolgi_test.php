@@ -11,12 +11,37 @@
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["id_test"])){
         $id_test = $_GET["id_test"];
-    }else{
+    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["id_test"]) && isset($_POST["invia"])) {
+        $id_test = $_POST["id_test"];
+        $id_user = $_SESSION["user_id"];
+        unset($_POST['invia']);
+
+        // Salva le risposte date
+        foreach ($_POST["risposte"] as $id_domanda => $risposta_data) {
+            $sql = "INSERT INTO risposte_date (id_test, id_user, id_domanda, tipologia_domanda, risposta_data) 
+                    VALUES (?, ?, ?, 
+                    (SELECT tipo FROM domanda WHERE id = ?), ?) 
+                    ON DUPLICATE KEY UPDATE risposta_data = ?";
+            $stmt = $conn->prepare($sql);
+
+            // Converti l'indice numerico per risposte multiple
+            if (is_array($risposta_data)) {
+                $risposta_data = implode(",", array_map('strval', $risposta_data));
+            }
+
+            $stmt->bind_param("iiiiss", $id_test, $id_user, $id_domanda, $id_domanda, $risposta_data, $risposta_data);
+            $stmt->execute();
+        }
+
+        // Redirect al riepilogo
+        go_to("studenti.php");
+        exit();
+    } else {
         go_to("studenti.php");
         exit();
     }
 
-    //prendi il test da database
+    // Prendi il test dal database
     $sql = "SELECT * FROM test WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id_test);
@@ -24,7 +49,7 @@
     $result = $stmt->get_result();
     $test = $result->fetch_assoc();
 
-    //prendi le domande del test
+    // Prendi le domande del test
     $sql = "SELECT * FROM domanda WHERE id_test = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id_test);
@@ -32,8 +57,8 @@
     $result = $stmt->get_result();
     $domande = $result->fetch_all(MYSQLI_ASSOC);
 
-    //prendi le risposte di ogni domanda
-    for ($i=0; $i < count($domande); $i++) { 
+    // Prendi le risposte di ogni domanda
+    for ($i = 0; $i < count($domande); $i++) { 
         $sql = "SELECT * FROM risposta WHERE id_domanda = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $domande[$i]["id"]);
@@ -42,11 +67,10 @@
         $risposte = $result->fetch_all(MYSQLI_ASSOC);
 
         $r = array();
-
-        foreach($risposte as $risposta){
-            $r[] = $risposta["testo"];
+        foreach ($risposte as $key => $risposta) {
+            $risposta["indice"] = $key; // Assegna un indice numerico
+            $r[] = $risposta;
         }
-
         $domande[$i]["risposte"] = $r;
     }
 
@@ -67,11 +91,8 @@
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid d-flex justify-content-between">
-
             <h3 class="fw-bold">Benvenuto <?php echo $_SESSION["username"]; ?>!</h3>
-
             <h4 class="fw-bold text-center" style="transform: translateX(-50%);">Svolgi Test</h4>
-
             <form class="d-flex" method="POST" action="php/do_logout.php">
                 <input class="btn btn-secondary ms-auto" type="submit" id="logout" name="logout" value="logout">
             </form>
@@ -79,32 +100,41 @@
     </nav>
 
     <div class="ms-5 mt-3">
-    <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="studenti.php">Home</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Svolgi test</li>
-    </ol>
-    </nav>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="studenti.php">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Svolgi test</li>
+            </ol>
+        </nav>
     </div>
 
     <div class="mt-3">
-
         <h2 class="fw-bold text-center my-5"><?php echo $test["titolo"] ?></h2>
-
-        <div class="d-flex flex-column w-90">
+        <form method="POST" action="svolgi_test.php" class="w-90 container">
+            <input type="hidden" name="id_test" value="<?php echo $id_test; ?>">
             <?php 
-                echo crea_card_da_domande($domande);
+                foreach ($domande as $domanda) {
+                    echo "<div class='card mb-3'>";
+                    echo "<div class='card-body'>";
+                    echo "<h5 class='card-title'>" . $domanda["testo"] . "</h5>";
+                    foreach ($domanda["risposte"] as $key => $risposta) {
+                        echo "<div class='form-check'>";
+                        echo "<input class='form-check-input' type='radio' name='risposte[" . $domanda["id"] . "]' value='" . $key+1 . "'>";
+                        echo "<label class='form-check-label'>" . $risposta["testo"] . "</label>";
+                        echo "</div>";
+                    }
+                    if ($domanda["tipo"] === "aperta") {
+                        echo "<textarea class='form-control' name='risposte[" . $domanda["id"] . "]'></textarea>";
+                    }
+                    echo "</div></div>";
+                }
             ?>
-
-            <form action="riepilogo.php" class="mb-5 mt-3 mx-auto w-75">
-                <input type="submit" class="btn btn-primary float-right" value="Termina test">
-            </form>
-
-        </div>
+            <input type="submit" name="invia" class="btn btn-primary float-right" value="Termina test">
+        </form>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6Hty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> 
 </body>
 </html>
