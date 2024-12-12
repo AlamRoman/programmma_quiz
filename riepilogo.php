@@ -126,12 +126,12 @@
 
 		<h2 class="fw-bold text-center my-5"><?php if(isset($test["titolo"])){echo $test["titolo"];}; ?></h2>
 
-		<div class="mt-3 card container p-0 w-75 mb-3" style="background-color: #c1ced9">
+		<div class="mt-3 card container p-0 w-75 mb-3" style="background-color: #efefef">
 			<div class="card-body">
 				<h4 class="fw-bold">Riepilogo</h4>
 				<hr/>
 				<p class="card-text m-0">Punteggio: <span class="fw-bold"><?php echo $punteggio;?></span>/<?php echo $total;?> (<?php echo round(($punteggio/$total)*100, 2);?>%)</p>
-				<p class="card-text m-0">Voto: <span class="fw-bold"><?php $risultato=round(($punteggio/$total)*10, 2); if($risultato<=5){echo "<span style='color:#ed6053;'>$risultato</span>";}else if($risultato==10){echo "<span style='color:#c561ff;text-shadow:0 0 10px #c561ff;'>$risultato</span>";}else{echo $risultato;};?></span></p>
+				<p class="card-text m-0">Voto: <span class="fw-bold"><?php $risultato=round(($punteggio/$total)*10, 2); if($risultato<=5){echo "<span style='color:#ed6053;'>$risultato</span>";}else if($risultato==10){echo "<span style='color:#c561ff;text-shadow:0 0 5px #cf6fff;'>$risultato</span>";}else{echo "<span style='color: #0da837;'>$risultato</span>";};?></span></p>
 			</div>
 		</div>
 
@@ -154,7 +154,7 @@
 							}
 						}
 						if ($domanda["tipo"] === "aperta") {
-							echo "<textarea class='form-control' disabled>" . htmlspecialchars($domanda["risposta_data"]) . "</textarea>";
+							echo "<textarea class='form-control auto-grow' disabled style='resize: none; min-height: 50px; overflow-y: hidden;'>" . htmlspecialchars($domanda["risposta_data"]) . "</textarea>";
 						}
 						echo "</div></div>";
 					}
@@ -167,6 +167,22 @@
 
 		</div>
 	</div>
+
+	<script>
+		const textareas = document.querySelectorAll('.auto-grow');
+
+		function resizeTextareas() {
+		textareas.forEach(textarea => {
+			textarea.style.height = 'auto';
+			textarea.style.height = (textarea.scrollHeight) + 'px';
+		});
+		}
+
+		window.addEventListener('load', resizeTextareas);
+
+		resizeTextareas();
+		
+	</script>
 
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6Hty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
