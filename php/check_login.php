@@ -32,7 +32,7 @@
 
                 $sql = "SELECT id_ruolo FROM ruolo_users WHERE id_user = ?";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("s", $user["id"]);
+                $stmt->bind_param("i", $user["id"]);
                 $stmt->execute();
                 $result = $stmt->get_result();
                 $ruolo_user = $result->fetch_assoc();

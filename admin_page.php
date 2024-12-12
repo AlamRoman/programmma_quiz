@@ -15,6 +15,40 @@
         unset($_SESSION["msg"]);
     }
 
+    $username = "";
+    $password = "";
+    $email = "";
+    $nome = "";
+    $cognome = "";
+    $user_ruolo = "";
+
+    if($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["update"])){
+        $id_user = $_GET["update"];
+
+        $sql = "SELECT * FROM users WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $id_user);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+
+        $username = $user["username"];
+        $password = $user["password"];
+        $email = $user["email"];
+        $nome = $user["first_name"];
+        $cognome = $user["last_name"];
+
+        $sql = "SELECT ruolo FROM ruolo_users WHERE id_user = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $user["id"]);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $ruolo_user = $result->fetch_assoc();
+
+        $user_ruolo  = $ruolo_user["ruolo"];
+
+    }
+
     //prendi tutti utenti dal db
     $sql = "SELECT * FROM users";
     $stmt = $conn->prepare($sql);
@@ -36,8 +70,15 @@
     foreach ($users as $user) {
         $table .= "<tr>";
 
-        foreach ($user as $data) {
-            $table .= "<td>$data</td>";
+        foreach ($user as $i => $data) {
+
+            if($i==="id"){
+                $table .= '<td><a href="'.$_SERVER['PHP_SELF'].'?update='.$user["id"].'"><button class="btn btn-secondary">'.$data.'</button></a></td>';
+            }else if($i==="password"){
+                $table .= "<td style=\"max-width:100px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;\">$data</td>";
+            }else{
+                $table .= "<td>$data</td>";
+            }
         }
 
         $sql = "SELECT ruolo FROM ruolo_users WHERE id_user = ?";
@@ -89,30 +130,32 @@
             <form action="php/registra_utente.php" method="POST">
                 <div class="my-2">
                     <label for="username" class="form-label">Username </label>
-                    <input type="text" id="username" name="username" class="form-control">
+                    <input type="text" id="username" name="username" class="form-control" <?php if($username != ""){echo 'value='.$username;} ?>>
                 </div>
                 <div class="my-2">
                     <label for="password" class="form-label">Password </label>
-                    <input type="text" id="password" name="password" class="form-control">
+                    <input type="text" id="password" name="password" class="form-control" <?php if($password != ""){echo 'value='.$password;} ?>>
                 </div>
                 <div class="my-2">
                     <label for="email" class="form-label">Email </label>
-                    <input type="text" id="email" name="email" class="form-control">
+                    <input type="text" id="email" name="email" class="form-control" <?php if($email != ""){echo 'value='.$email;} ?>>
                 </div>
                 <div class="my-2">
                     <label for="Nome" class="form-label">Nome </label>
-                    <input type="text" id="nome" name="nome" class="form-control">
+                    <input type="text" id="nome" name="nome" class="form-control" <?php if($nome != ""){echo 'value='.$nome;} ?>>
                 </div>
                 <div class="my-2">
                     <label for="cognome" class="form-label">Cognome </label>
-                    <input type="text" id="cognome" name="cognome" class="form-control">
+                    <input type="text" id="cognome" name="cognome" class="form-control" <?php if($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["update"])){echo 'value='.$cognome;} ?>>
                 </div>
                 <div class="my-2">
                     <label for="ruolo" class="form-label">Ruolo </label>
-                    <select name="ruolo" id="ruolo" class="form-select">
-                        <option selected disabled>--- segli ruolo ---</option>
-                        <option value="studente">Studente</option>
-                        <option value="docente">Docente</option>
+                    <?php if($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["update"])){echo '<input type="hidden" name="ruolo" value="'.$user_ruolo.'"/>';} ?>
+                    <select name="ruolo" id="ruolo" class="form-select" <?php if($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["update"])){echo "disabled";} ?> >
+                        <option disabled <?php if($user_ruolo == ""){echo "selected";} ?>>--- segli ruolo ---</option>
+                        <option disabled value="admin" <?php if($user_ruolo === "admin"){echo "selected";} ?>>Admin</option>
+                        <option value="studente" <?php if($user_ruolo === "studente"){echo "selected";} ?>>Studente</option>
+                        <option value="docente" <?php if($user_ruolo === "docente"){echo "selected";} ?>>Docente</option>
                     </select>
                 </div>
                 <?php 

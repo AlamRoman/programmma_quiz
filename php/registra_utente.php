@@ -17,7 +17,34 @@
         $row = mysqli_num_rows($result);
 
         if ($row > 0) {
-            $msg = "Errore : Utente con username $username esiste gia";
+
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+            try {
+
+                $sql = 'SELECT * FROM users WHERE username=?';
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("s", $username);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $user = $result->fetch_assoc();
+
+                $user_id = $user["id"];
+
+                $sql = 'UPDATE users SET username=?,password=?,email=?,first_name=?,last_name=? WHERE id=?;';
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("sssssi", $username, $hashed_password, $email, $nome, $cognome,$user_id);
+                $stmt->execute();
+
+            } catch (Exception $e) {
+                $msg =  "Database error: " . $e->getMessage();
+
+                $_SESSION["msg"] = $msg;
+                header("location:../admin_page.php");
+                exit();
+            }
+
+            $msg = "Utente $username modificato correttamente";
 
             $_SESSION["msg"] = $msg;
             header("location:../admin_page.php");
