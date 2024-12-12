@@ -83,7 +83,7 @@ INSERT INTO `risposta` (`id`, `testo`, `corretta`, `id_domanda`) VALUES
 (29, 'Connettere due tabelle', 0, 2),
 (30, 'Ordinare i dati in una tabella', 0, 2),
 (31, 'Identificare univocamente ogni riga di una tabella', 1, 2),
-(32, 'Limitare l\'accesso ai dati', 0, 2),
+(32, "Limitare l'accesso ai dati", 0, 2),
 (33, 'ALTER TABLE', 1, 3),
 (34, 'UPDATE', 0, 3),
 (35, 'CREATE TABLE', 0, 3),
