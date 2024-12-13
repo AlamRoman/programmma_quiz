@@ -30,7 +30,7 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <div class="container-fluid d-flex justify-content-between">
 
             <h3 class="fw-bold">Benvenuto <?php echo $_SESSION["username"]; ?>!</h3>
@@ -43,7 +43,7 @@
         </div>
     </nav>
 
-    <div class="ms-5 mt-3">
+    <div class="ms-5 mt-5 pt-4">
     <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item active" aria-current="page">Home</li>

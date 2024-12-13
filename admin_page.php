@@ -123,7 +123,7 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <div class="container-fluid d-flex justify-content-between">
 
             <h3 class="fw-bold">Benvenuto <?php echo $_SESSION["username"]; ?>!</h3>
@@ -136,7 +136,7 @@
         </div>
     </nav>
 
-    <div class="container my-5 d-flex flex-wrap">
+    <div class="container my-5 pt-5 d-flex flex-wrap">
         <div class="container m-3 border p-3" style="min-width: 30vw; max-width: 50vw;">
             <h3 class="text-center my-3">Registra/modifica utente</h3>
             <hr>
