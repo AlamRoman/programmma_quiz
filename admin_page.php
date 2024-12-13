@@ -22,30 +22,40 @@
     $cognome = "";
     $user_ruolo = "";
 
-    if($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["update"])){
-        $id_user = $_GET["update"];
+    if($_SERVER['REQUEST_METHOD'] === 'GET'){
 
-        $sql = "SELECT * FROM users WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $id_user);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
 
-        $username = $user["username"];
-        $password = $user["password"];
-        $email = $user["email"];
-        $nome = $user["first_name"];
-        $cognome = $user["last_name"];
+        if(isset($_GET["update"])){
+            $id_user = $_GET["update"];
 
-        $sql = "SELECT ruolo FROM ruolo_users WHERE id_user = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $user["id"]);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $ruolo_user = $result->fetch_assoc();
+            $sql = "SELECT * FROM users WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $id_user);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $user = $result->fetch_assoc();
 
-        $user_ruolo  = $ruolo_user["ruolo"];
+            $username = $user["username"];
+            $password = $user["password"];
+            $email = $user["email"];
+            $nome = $user["first_name"];
+            $cognome = $user["last_name"];
+
+            $sql = "SELECT ruolo FROM ruolo_users WHERE id_user = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $user["id"]);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $ruolo_user = $result->fetch_assoc();
+
+            $user_ruolo = $ruolo_user["ruolo"];
+
+        }else if(isset($_GET["delete"])){
+            $sql = "DELETE FROM users WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $_GET["delete"]);
+            $stmt->execute();
+        }
 
     }
 
@@ -64,7 +74,7 @@
     foreach ($fields as $field) {
         $table .= "<th>$field->name</th>";
     }
-    $table .= "<th>ruolo</th>";
+    $table .= "<th>ruolo</th><th>elimina</th>";
     $table .= "</thead></tr><tbody>";
 
     foreach ($users as $user) {
@@ -90,6 +100,8 @@
 
         $table .= '<td>'.$ruolo["ruolo"].'</td>';
 
+        $table .= '<td>'.'<a href="#" class="btn btn-danger w-100" onclick="return confirmDelete(' . $user["id"] . ')"><i class="bi bi-trash"></i></a>'.'</td>';
+
         $table .= "</tr>";
     }
 
@@ -106,6 +118,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 </head>
 <body>
@@ -130,11 +143,11 @@
             <form action="php/registra_utente.php" method="POST">
                 <div class="my-2">
                     <label for="username" class="form-label">Username </label>
-                    <input type="text" id="username" name="username" class="form-control" <?php if($username != ""){echo 'value='.$username;} ?>>
+                    <input type="text" id="username" name="username" class="form-control" required <?php if($username != ""){echo 'value='.$username;} ?>>
                 </div>
                 <div class="my-2">
                     <label for="password" class="form-label">Password </label>
-                    <input type="text" id="password" name="password" class="form-control" <?php if($password != ""){echo 'value='.$password;} ?>>
+                    <input type="text" id="password" name="password" class="form-control" required <?php if($password != ""){echo 'value='.$password;} ?>>
                 </div>
                 <div class="my-2">
                     <label for="email" class="form-label">Email </label>
@@ -151,11 +164,10 @@
                 <div class="my-2">
                     <label for="ruolo" class="form-label">Ruolo </label>
                     <?php if($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["update"])){echo '<input type="hidden" name="ruolo" value="'.$user_ruolo.'"/>';} ?>
-                    <select name="ruolo" id="ruolo" class="form-select" <?php if($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["update"])){echo "disabled";} ?> >
-                        <option disabled <?php if($user_ruolo == ""){echo "selected";} ?>>--- segli ruolo ---</option>
-                        <option disabled value="admin" <?php if($user_ruolo === "admin"){echo "selected";} ?>>Admin</option>
-                        <option value="studente" <?php if($user_ruolo === "studente"){echo "selected";} ?>>Studente</option>
+                    <select name="ruolo" id="ruolo" class="form-select" <?php if($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["update"])){echo "disabled";} ?> required>
+                        <option value="studente" selected <?php if($user_ruolo === "studente"){echo "selected";} ?>>Studente</option>
                         <option value="docente" <?php if($user_ruolo === "docente"){echo "selected";} ?>>Docente</option>
+                        <option disabled value="admin" <?php if($user_ruolo === "admin"){echo "selected";} ?>>Admin</option>
                     </select>
                 </div>
                 <?php 
@@ -171,6 +183,9 @@
                     <input type="submit" name="invia" id="invia" value="Invia" class="btn btn-primary">
                 </div>
             </form>
+            <div class="mt-3 ms-auto d-flex justify-content-center">
+                <a href="admin_page.php"><button class="btn btn-secondary">Cancella campi</button></a>
+            </div>
         </div>
 
         <div class="container m-3 border p-3">
@@ -181,6 +196,16 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function confirmDelete(id) {
+            var confirmDelete = confirm("Sei sicuro di voler eliminare quest'utente?");
+            if (confirmDelete) {
+                window.location.href = "admin_page.php?delete=" + id;
+            }
+            return false;
+        }
+    </script>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
