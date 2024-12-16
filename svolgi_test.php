@@ -111,8 +111,9 @@
     </div>
 
     <div class="my-3" style="height: 100%;">
-        <h2 class="fw-bold text-center my-5"><?php echo $test["titolo"] ?></h2>
-        <form method="POST" action="svolgi_test.php" class="w-90 container mb-3">
+        <h2 class="fw-bold text-center mt-5"><?php echo $test["titolo"] ?></h2>
+        <p class="text-center mb-5"><?php echo $test["descrizione"] ?></p>
+        <form method="POST" action="svolgi_test.php" class="w-90 container mt-3 mb-3">
             <input type="hidden" name="id_test" value="<?php echo $id_test; ?>">
             <?php 
                 foreach ($domande as $domanda) {

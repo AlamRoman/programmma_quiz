@@ -124,8 +124,8 @@
 
 	<div class="mt-2">
 
-		<h2 class="fw-bold text-center my-5"><?php if(isset($test["titolo"])){echo $test["titolo"];}; ?></h2>
-
+		<h2 class="fw-bold text-center mt-5"><?php if(isset($test["titolo"])){echo $test["titolo"];}; ?></h2>
+		<p class="text-center mb-5"><?php echo $test["descrizione"] ?></p>
 		<div class="mt-3 card container p-0 w-75 mb-3" style="background-color: #efefef">
 			<div class="card-body">
 				<h4 class="fw-bold">Riepilogo</h4>
