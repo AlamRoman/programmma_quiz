@@ -9,6 +9,7 @@
         go_to("login_page.php");
     }
 
+    //test
     $sql = "SELECT id, titolo, descrizione FROM test WHERE creato_da = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $_SESSION["user_id"]);
@@ -30,25 +31,14 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-        <div class="container-fluid d-flex justify-content-between">
-
-            <h3 class="fw-bold">Benvenuto <?php echo $_SESSION["username"]; ?>!</h3>
-
-            <h4 class="fw-bold text-center" style="transform: translateX(-50%);">Home</h4>
-
-            <form class="d-flex" method="POST" action="php/do_logout.php">
-                <input class="btn btn-secondary ms-auto" type="submit" id="logout" name="logout" value="logout">
-            </form>
-        </div>
-    </nav>
+    <?php include "include/navbar-docente.php"; ?>
 
     <div class="ms-5 mt-5 pt-4">
-    <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item active" aria-current="page">Home</li>
-    </ol>
-    </nav>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">Home</li>
+            </ol>
+        </nav>
     </div>
 
     <?php 
