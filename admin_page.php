@@ -51,12 +51,53 @@
             $user_ruolo = $ruolo_user["ruolo"];
 
         }else if(isset($_GET["delete"])){
-            $sql = "DELETE FROM users WHERE id = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("i", $_GET["delete"]);
-            $stmt->execute();
+            
+            if($_GET["delete"] !== $_SESSION["user_id"]){
+                
+                $sql = "DELETE FROM users WHERE id = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("i", $_GET["delete"]);
+                $stmt->execute();
+            }
         }
 
+    }else if($_SERVER['REQUEST_METHOD'] === 'POST'){
+        if(isset($_POST["registra_classe"])){
+
+            $nome_classe = trim($_POST['nome_classe']);
+            $anno_inizio = intval($_POST['anno_inizio']);
+            $anno_fine = intval($_POST['anno_fine']);
+
+            if (empty($nome_classe) || empty($anno_inizio) || empty($anno_fine)) {
+                $msg_registra = "Tutti i campi sono obbligatori.";
+                exit;
+            }
+        
+            if ($anno_inizio >= $anno_fine) {
+                $msg_registra = "L'anno di inizio deve essere precedente all'anno di fine.";
+                exit;
+            }
+        
+            try {
+                $sql = "INSERT INTO classe (nome, anno_inizio, anno_fine) VALUES (?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+        
+                if (!$stmt) {
+                    throw new Exception("Errore nella preparazione della query.");
+                }
+                $stmt->bind_param("sss", $nome_classe, $anno_inizio, $anno_fine);
+        
+                if ($stmt->execute()) {
+                    $msg_registra = "Classe registrata con successo!";
+                } else {
+                    throw new Exception("Errore durante l'inserimento: " . $stmt->error);
+                }
+        
+                $stmt->close();
+            } catch (Exception $e) {
+                $msg_registra = $e->getMessage();
+            }
+        }
     }
 
     //prendi tutti utenti dal db
@@ -106,6 +147,34 @@
     }
 
     $table .= "</tbody></table>";
+
+    //tabella classi
+    $sql = "SELECT nome, anno_inizio, anno_fine FROM classe";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $fields = $result->fetch_fields();
+    $classi = $result->fetch_all(MYSQLI_ASSOC);
+
+    $table_classi = '<table class="table table-striped table-hover table-bordered">';
+
+    $table_classi .= '<tr><thead class="table-dark">';
+    foreach ($fields as $field) {
+        $table_classi .= "<th>$field->name</th>";
+    }
+    $table_classi .= "</thead></tr><tbody>";
+
+    foreach ($classi as $classe) {
+        $table_classi .= "<tr>";
+
+        foreach ($classe as $i => $data) {
+            $table_classi .= "<td>$data</td>";
+        }
+
+        $table_classi .= "</tr>";
+    }
+
+    $table_classi .= "</tbody></table>";
 
 ?>
 
@@ -195,6 +264,51 @@
                 <?php  echo $table;?>
             </div>
         </div>
+
+        <div class="w-100 d-flex justify-content-center">
+            <div class="container m-3 border p-3" style="width: 30vw;">
+                <h3 class="text-center my-3">Registra classe</h3>
+                <hr>
+                <form action="admin_page.php" method="POST">
+                    <div class="my-2">
+                        <label for="nome_classe" class="form-label">Nome Classe </label>
+                        <input type="text" id="nome_classe" name="nome_classe" class="form-control" required>
+                    </div>
+                    <div class="my-2">
+                        <label for="anno_inizio" class="form-label">Anno Inizio </label>
+                        <input type="number" id="anno_inizio" name="anno_inizio" class="form-control" required>
+                    </div>
+                    <div class="my-2">
+                        <label for="anno_fine" class="form-label">Anno Fine </label>
+                        <input type="number" id="anno_fine" name="anno_fine" class="form-control" required>
+                    </div>
+
+                    <?php 
+                        if($msg != ""){
+                            echo '
+                                <div class="alert alert-primary mt-3" role="alert">
+                                    '.$msg_registra.'
+                                </div>
+                            ';
+                        }
+                    ?>
+
+                    <div class="mt-5 d-flex justify-content-center">
+                        <input type="submit" name="registra_classe" id="registra_classe" value="Invia" class="btn btn-primary">
+                    </div>
+                </form>
+            </div>
+
+            <div class="container m-3 border p-3 w-50">
+                <h3 class="text-center my-3">Tabella Classi</h3>
+                <hr>
+                <div class="table-responsive">
+                    <?php echo $table_classi; ?>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 
     <script>
