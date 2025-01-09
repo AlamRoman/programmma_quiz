@@ -9,8 +9,26 @@
 		go_to("login_page.php");
 	}
 
-	$sql = "SELECT id, titolo, descrizione FROM test";
-	$result = $conn->query($sql);
+	$sql = "SELECT id_classe FROM studente_classe WHERE id_studente = ?";
+	$stmt = $conn->prepare($sql);
+    $stmt->bind_param('i', $_SESSION["user_id"]);
+	$stmt->execute();
+	$result = $stmt->get_result();
+	$id_classe = $result->fetch_assoc();
+
+    $id_classe = $id_classe["id_classe"];
+
+    $sql = "
+        SELECT t.id, t.titolo, t.descrizione, st.data_fine AS scadenza
+        FROM test t
+        INNER JOIN sessione_test st ON t.id = st.id_test
+        WHERE st.id_classe = ? AND st.data_inizio <= CURDATE()
+    ";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('i', $id_classe);
+    $stmt->execute();
+    $tests = $stmt->get_result();
 
 ?>
 
@@ -21,32 +39,20 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Studenti</title>
 
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 </head>
 <body>
 
-	<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-		<div class="container-fluid d-flex justify-content-between">
-
-			<h3 class="fw-bold">Benvenuto <?php echo $_SESSION["username"]; ?>!</h3>
-
-			<h4 class="fw-bold text-center" style="transform: translateX(-50%);">Home</h4>
-
-			<form class="d-flex" method="POST" action="php/do_logout.php">
-				<input class="btn btn-secondary ms-auto" type="submit" id="logout" name="logout" value="logout">
-			</form>
-		</div>
-	</nav>
+	<?php include "include/navbar-studente.php"; ?>
 
 	<div class="ms-5 mt-5 pt-4">
-	<nav aria-label="breadcrumb">
-	<ol class="breadcrumb">
-		<li class="breadcrumb-item active" aria-current="page">Home</li>
-	</ol>
-	</nav>
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item active" aria-current="page">Home</li>
+			</ol>
+		</nav>
 	</div>
 
 	<?php 
@@ -75,8 +81,8 @@
 		<div>
 			<ul class="list-group p-1" style="background-color: #f0f0f0;">
 				<?php
-					if ($result->num_rows > 0) {
-						while ($row = $result->fetch_assoc()) {
+					if ($tests->num_rows > 0) {
+						while ($row = $tests->fetch_assoc()) {
 							// Verifica se esistono dati dell'utente per il test
 							$sql_check = "SELECT COUNT(*) AS count FROM risposte_date WHERE id_test = ? AND id_user = ?";
 							$stmt = $conn->prepare($sql_check);
@@ -84,20 +90,36 @@
 							$stmt->execute();
 							$result_check = $stmt->get_result();
 							$data_check = $result_check->fetch_assoc();
-							$has_data = $data_check["count"] > 0;
+							$has_data = $data_check["count"] > 0 ? 1 : 0;
 
 							echo '<li class="list-group-item list-group-item-action d-flex justify-content-between border">';
 							echo '<div>';
 							echo '<h6>' . htmlspecialchars($row['titolo']) . '</h6>';
 							echo '<p>' . htmlspecialchars($row['descrizione']) . '</p>';
 							echo '</div>';
+							echo '<div class="me-5 ms-auto my-auto"><pclass="mt-auto"> Scadenza : ' . htmlspecialchars($row['scadenza']) . '</p></div>';
 							echo '<div class="my-auto d-flex gap-2">';
-							if ($has_data) {
-								echo '<a href="riepilogo.php?id_test='.$row["id"].'" class="btn btn-info"><i class="bi bi-eye"></i> Riepilogo</a>';
-								echo '<button class="btn btn-success" style="background-color:#968887; border:none; color: #000;" disabled><i class="bi bi-journal-text"></i> Svolgi</button>';
+
+							if ($row["scadenza"] <= date('Y-m-d H:i:s')) {
+
+								if($has_data){
+									echo '<a href="riepilogo.php?id_test='.$row["id"].'" class="btn btn-info"><i class="bi bi-eye"></i> Riepilogo</a>';
+									echo '<button class="btn btn-success" style="background-color:#968887; border:none; color: #000;" disabled><i class="bi bi-journal-text"></i> Svolgi</button>';
+								}else{
+									echo '<button href="riepilogo.php?id_test='.$row["id"].'" class="btn btn-info" style="background-color:#968887; border:none; color: #000;" disabled><i class="bi bi-eye"></i> Riepilogo</button>';
+									echo '<button class="btn btn-success" style="background-color:#968887; border:none; color: #000;" disabled><i class="bi bi-journal-text"></i> Svolgi</button>';
+								}
+
 							} else {
-								echo '<button class="btn btn-info" style="background-color:#968887; border:none;" disabled><i class="bi bi-eye"></i> Riepilogo</button>';
-								echo '<a href="svolgi_test.php?id_test='.$row["id"].'" class="btn btn-success"><i class="bi bi-journal-text"></i> Svolgi</a>';
+
+								if($has_data){
+									echo '<a href="riepilogo.php?id_test='.$row["id"].'" class="btn btn-info"><i class="bi bi-eye"></i> Riepilogo</a>';
+									echo '<button class="btn btn-success" style="background-color:#968887; border:none; color: #000;" disabled><i class="bi bi-journal-text"></i> Svolgi</button>';
+								}else{
+									echo '<button class="btn btn-info" style="background-color:#968887; border:none; color: #000;" disabled><i class="bi bi-eye"></i> Riepilogo</button>';
+									echo '<a href="svolgi_test.php?id_test='.$row["id"].'" class="btn btn-success"><i class="bi bi-journal-text"></i> Svolgi</a>';
+								}
+								
 							}
 							echo '</div>';
 							echo '</li>';
@@ -112,7 +134,6 @@
 
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6Hty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> 
 	
 </body>
 </html>

@@ -77,9 +77,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Riepilogo - test</title>
 
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+	
 	<style>
 		input[disabled], textarea[disabled] {
 			background-color: #fff !important;
@@ -100,29 +100,18 @@
 </head>
 <body>
 
-	<nav class="navbar navbar-expand-lg navbar-light bg-light">
-		<div class="container-fluid d-flex justify-content-between">
+	<?php include "include/navbar-studente.php"; ?>
 
-			<h3 class="fw-bold">Benvenuto <?php echo $_SESSION["username"]; ?>!</h3>
-
-			<h4 class="fw-bold text-center" style="transform: translateX(-75%);">Riepilogo</h4>
-
-			<form class="d-flex" method="POST" action="php/do_logout.php">
-				<input class="btn btn-secondary ms-auto" type="submit" id="logout" name="logout" value="logout">
-			</form>
-		</div>
-	</nav>
-
-	<div class="ms-5 mt-3">
-	<nav aria-label="breadcrumb">
-	<ol class="breadcrumb">
-		<li class="breadcrumb-item"><a href="studenti.php">Home</a></li>
-		<li class="breadcrumb-item active" aria-current="page">Riepilogo test</li>
-	</ol>
-	</nav>
+	<div class="ms-5 mt-5 pt-4" style="margin-top: 100px;">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="homeStudente.php">Home</a></li>
+				<li class="breadcrumb-item active" aria-current="page">Riepilogo test</li>
+			</ol>
+		</nav>
 	</div>
 
-	<div class="mt-2">
+	<dclass="mt-2">
 
 		<h2 class="fw-bold text-center mt-5"><?php if(isset($test["titolo"])){echo $test["titolo"];}; ?></h2>
 		<p class="text-center mb-5"><?php echo $test["descrizione"] ?></p>
@@ -185,7 +174,6 @@
 	</script>
 
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6Hty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> 
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6Hty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script> 
 </body>
 </html>
