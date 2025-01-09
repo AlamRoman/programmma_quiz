@@ -47,10 +47,10 @@
                     go_to("../admin_page.php");
                     exit();
                 }else if($id_ruolo==3){//docente
-                    go_to("../docenti.php");
+                    go_to("../homeDocente.php");
                     exit();
                 }else{//altri
-                    go_to("../studenti.php");
+                    go_to("../homeStudente.php");
                     exit();
                 }
 

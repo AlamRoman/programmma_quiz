@@ -29,6 +29,7 @@
 
 </style>
 
+<div class="h-100">
 <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
     <div class="container-fluid d-flex justify-content-between">
     
@@ -37,10 +38,10 @@
         <div class="d-flex align-items-center">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link fw-bold <?php echo basename($_SERVER['PHP_SELF']) == 'docenti.php' ? 'nav_active' : ''; ?>" href="docenti.php">Home</a>
+                    <a class="nav-link fw-bold <?php echo (basename($_SERVER['PHP_SELF']) == 'docenti.php' || basename($_SERVER['PHP_SELF']) == 'creaTest.php' || basename($_SERVER['PHP_SELF']) == 'modificaTest.php') ? 'nav_active' : ''; ?>" href="docenti.php">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link fw-bold <?php echo basename($_SERVER['PHP_SELF']) == 'sessione_test.php' ? 'nav_active' : ''; ?>" href="sessione_test.php">Sessione test</a>
+                    <a class="nav-link fw-bold <?php echo (basename($_SERVER['PHP_SELF']) == 'sessione_test.php' || basename($_SERVER['PHP_SELF']) == 'creaSessioneTest.php') ? 'nav_active' : ''; ?>" href="sessione_test.php">Sessione test</a>
                 </li>
             </ul>
         </div>
@@ -56,5 +57,6 @@
         </div>
     </div>
 </nav>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
