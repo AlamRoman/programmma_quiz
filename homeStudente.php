@@ -19,7 +19,7 @@
     $id_classe = $id_classe["id_classe"];
 
     $sql = "
-        SELECT t.id, t.titolo, t.descrizione, st.data_fine AS scadenza
+        SELECT t.id AS id_test, t.titolo, t.descrizione, st.id AS id_sessione, st.data_fine AS scadenza, st.nome AS nome_sessione
         FROM test t
         INNER JOIN sessione_test st ON t.id = st.id_test
         WHERE st.id_classe = ? AND st.data_inizio <= CURDATE()
@@ -82,11 +82,12 @@
 			<ul class="list-group p-1" style="background-color: #f0f0f0;">
 				<?php
 					if ($tests->num_rows > 0) {
+						
 						while ($row = $tests->fetch_assoc()) {
 							// Verifica se esistono dati dell'utente per il test
-							$sql_check = "SELECT COUNT(*) AS count FROM risposte_date WHERE id_test = ? AND id_user = ?";
+							$sql_check = "SELECT COUNT(*) AS count FROM risultati WHERE id_sessione = ? AND id_studente = ?";
 							$stmt = $conn->prepare($sql_check);
-							$stmt->bind_param("ii", $row["id"], $_SESSION["user_id"]);
+							$stmt->bind_param("ii", $row["id_sessione"], $_SESSION["user_id"]);
 							$stmt->execute();
 							$result_check = $stmt->get_result();
 							$data_check = $result_check->fetch_assoc();
@@ -94,7 +95,7 @@
 
 							echo '<li class="list-group-item list-group-item-action d-flex justify-content-between border">';
 							echo '<div>';
-							echo '<h6>' . htmlspecialchars($row['titolo']) . '</h6>';
+							echo '<h6>' . htmlspecialchars($row['nome_sessione']) . " | " . htmlspecialchars($row['titolo']) . '</h6>';
 							echo '<p>' . htmlspecialchars($row['descrizione']) . '</p>';
 							echo '</div>';
 							echo '<div class="me-5 ms-auto my-auto"><pclass="mt-auto"> Scadenza : ' . htmlspecialchars($row['scadenza']) . '</p></div>';
@@ -103,21 +104,21 @@
 							if ($row["scadenza"] <= date('Y-m-d H:i:s')) {
 
 								if($has_data){
-									echo '<a href="riepilogo.php?id_test='.$row["id"].'" class="btn btn-info"><i class="bi bi-eye"></i> Riepilogo</a>';
+									echo '<a href="riepilogo.php?id_sessione='.$row["id_sessione"].'" class="btn btn-info"><i class="bi bi-eye"></i> Riepilogo</a>';
 									echo '<button class="btn btn-success" style="background-color:#968887; border:none; color: #000;" disabled><i class="bi bi-journal-text"></i> Svolgi</button>';
 								}else{
-									echo '<button href="riepilogo.php?id_test='.$row["id"].'" class="btn btn-info" style="background-color:#968887; border:none; color: #000;" disabled><i class="bi bi-eye"></i> Riepilogo</button>';
+									echo '<button href="riepilogo.php?id_sessione='.$row["id_sessione"].'" class="btn btn-info" style="background-color:#968887; border:none; color: #000;" disabled><i class="bi bi-eye"></i> Riepilogo</button>';
 									echo '<button class="btn btn-success" style="background-color:#968887; border:none; color: #000;" disabled><i class="bi bi-journal-text"></i> Svolgi</button>';
 								}
 
 							} else {
 
 								if($has_data){
-									echo '<a href="riepilogo.php?id_test='.$row["id"].'" class="btn btn-info"><i class="bi bi-eye"></i> Riepilogo</a>';
+									echo '<a href="riepilogo.php?id_sessione='.$row["id_sessione"].'" class="btn btn-info"><i class="bi bi-eye"></i> Riepilogo</a>';
 									echo '<button class="btn btn-success" style="background-color:#968887; border:none; color: #000;" disabled><i class="bi bi-journal-text"></i> Svolgi</button>';
 								}else{
 									echo '<button class="btn btn-info" style="background-color:#968887; border:none; color: #000;" disabled><i class="bi bi-eye"></i> Riepilogo</button>';
-									echo '<a href="svolgi_test.php?id_test='.$row["id"].'" class="btn btn-success"><i class="bi bi-journal-text"></i> Svolgi</a>';
+									echo '<a href="svolgi_test.php?id_sessione='.$row["id_sessione"].'" class="btn btn-success"><i class="bi bi-journal-text"></i> Svolgi</a>';
 								}
 								
 							}

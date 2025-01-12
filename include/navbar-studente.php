@@ -44,7 +44,7 @@
 
         <div class="dropdown me-2" style="background-color: transparent;">
             <button style="background-color: transparent;" class="dropdown-toggle border-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="resources/docente.png" class="profile-img" alt="Profile Image">
+                <img src="resources/studente.jpg" class="profile-img" alt="Profile Image">
             </button>
             <ul class="dropdown-menu me-5" aria-labelledby="dropdownMenuButton">
                 <li><a class="dropdown-item" href="profile.php">Profile</a></li>
