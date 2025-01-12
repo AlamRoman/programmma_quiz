@@ -100,6 +100,37 @@
         }
     }
 
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['assegna_studente'])) {
+        $id_studente = intval($_POST['id_studente']);
+        $id_classe = intval($_POST['id_classe']);
+    
+        if (empty($id_studente) || empty($id_classe)) {
+            $msg_assegna = "Seleziona uno studente e una classe.";
+        } else {
+            try {
+                $sql = "INSERT INTO studente_classe (id_studente, id_classe) VALUES (?, ?)";
+                $stmt = $conn->prepare($sql);
+    
+                if (!$stmt) {
+                    throw new Exception("Errore nella preparazione della query.");
+                }
+    
+                $stmt->bind_param("ii", $id_studente, $id_classe);
+    
+                if ($stmt->execute()) {
+                    $msg_assegna = "Studente assegnato alla classe con successo!";
+                } else {
+                    throw new Exception("Errore durante l'inserimento: " . $stmt->error);
+                }
+    
+                $stmt->close();
+            } catch (Exception $e) {
+                $msg_assegna = $e->getMessage();
+            }
+        }
+    }
+    
+
     //prendi tutti utenti dal db
     $sql = "SELECT * FROM users";
     $stmt = $conn->prepare($sql);
@@ -176,6 +207,26 @@
 
     $table_classi .= "</tbody></table>";
 
+
+    // Prendi gli studenti
+    $sql_studenti = "
+        SELECT users.id, users.username
+        FROM users 
+        INNER JOIN ruolo_users ON users.id = ruolo_users.id_user 
+        WHERE ruolo_users.ruolo = 'studente' 
+        AND users.id NOT IN (SELECT id_studente FROM studente_classe)
+    ";
+    $stmt = $conn->prepare($sql_studenti);
+    $stmt->execute();
+    $result_studenti = $stmt->get_result();
+    $studenti = $result_studenti->fetch_all(MYSQLI_ASSOC);
+    
+    // Prendi le classi
+    $sql_classi = "SELECT id, nome, anno_inizio, anno_fine FROM classe";
+    $stmt = $conn->prepare($sql_classi);
+    $stmt->execute();
+    $result_classi = $stmt->get_result();
+    $classi_assegna = $result_classi->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -306,6 +357,49 @@
                     <?php echo $table_classi; ?>
                 </div>
             </div>
+        </div>
+        
+        <div class="container m-3 border p-3" style="width: 30vw;">
+            <h3 class="text-center my-3">Assegna Studente alla Classe</h3>
+            <hr>
+            <form action="admin_page.php" method="POST">
+                <div class="my-2">
+                    <label for="id_studente" class="form-label">Seleziona Studente</label>
+                    <select id="id_studente" name="id_studente" class="form-select" required>
+                        <option value="">-- Scegli uno studente --</option>
+                        <?php foreach ($studenti as $studente): ?>
+                            <option value="<?= $studente['id'] ?>">
+                                <?= $studente['username']?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="my-2">
+                    <label for="id_classe" class="form-label">Seleziona Classe</label>
+                    <select id="id_classe" name="id_classe" class="form-select" required>
+                        <option value="">-- Scegli una classe --</option>
+                        <?php foreach ($classi_assegna as $classe): ?>
+                            <option value="<?= $classe['id'] ?>">
+                                <?= $classe['nome'] . ' (' . $classe['anno_inizio'] . '-' . $classe['anno_fine'] . ')' ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <?php 
+                    if (isset($msg_assegna)) {
+                        echo '
+                            <div class="alert alert-primary mt-3" role="alert">
+                                '.$msg_assegna.'
+                            </div>
+                        ';
+
+                        unset($msg_assegna);
+                    }
+                ?>
+                <div class="mt-5 d-flex justify-content-center">
+                    <input type="submit" name="assegna_studente" value="Assegna" class="btn btn-primary">
+                </div>
+            </form>
         </div>
 
 
