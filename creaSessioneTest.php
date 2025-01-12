@@ -17,20 +17,22 @@
         $data_inizio = $_POST['data_inizio'];
         $data_fine = $_POST['data_fine'];
     
-        $sql = "INSERT INTO sessione_test (id_test, nome, id_classe, data_inizio, data_fine, stato) VALUES (?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO sessione_test (id_test, nome, id_classe, data_inizio, data_fine, stato, creato_da) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         $stato = "";
+
+        $current_date = date("Y-m-d H:i:s");
 
         if ($current_date < $data_inizio) {
             $stato = 'programmato'; 
         } elseif ($current_date >= $data_inizio && $current_date <= $data_fine) {
             $stato = 'in corso'; 
         } else {
-            $stato = 'completo';
+            $stato = 'completato';
         }
     
         if ($stmt = $conn->prepare($sql)) {
-            $stmt->bind_param("isssss", $id_test, $titolo, $id_classe, $data_inizio, $data_fine, $stato);
+            $stmt->bind_param("isssssi", $id_test, $titolo, $id_classe, $data_inizio, $data_fine, $stato, $_SESSION["user_id"]);
     
             if ($stmt->execute()) {
                 echo "<script>alert('Sessione test creata con successo!');</script>";

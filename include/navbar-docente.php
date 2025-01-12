@@ -36,12 +36,15 @@
         <h3 class="fw-bold mb-0">Benvenuto <?php echo $_SESSION["username"]; ?>!</h3>
 
         <div class="d-flex align-items-center">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav gap-3 me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link fw-bold <?php echo (basename($_SERVER['PHP_SELF']) == 'homeDocente.php' || basename($_SERVER['PHP_SELF']) == 'creaTest.php' || basename($_SERVER['PHP_SELF']) == 'modificaTest.php') ? 'nav_active' : ''; ?>" href="homeDocente.php">Lista Test</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link fw-bold <?php echo (basename($_SERVER['PHP_SELF']) == 'sessione_test.php' || basename($_SERVER['PHP_SELF']) == 'creaSessioneTest.php') ? 'nav_active' : ''; ?>" href="sessione_test.php">Sessione test</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-bold <?php echo (basename($_SERVER['PHP_SELF']) == 'sessioneTestSvolti.php' || basename($_SERVER['PHP_SELF']) == 'riepilogo.php') ? 'nav_active' : ''; ?>" href="sessioneTestSvolti.php">Test svolti</a>
                 </li>
             </ul>
         </div>

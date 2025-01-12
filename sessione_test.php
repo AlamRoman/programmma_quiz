@@ -184,7 +184,7 @@
                         echo '</li>';
                     }
                 } else {
-                    echo '<li class="list-group-item">Nessun test trovato</li>';
+                    echo '<li class="list-group-item">Nessun sessione test trovato</li>';
                 }
 
                 ?>

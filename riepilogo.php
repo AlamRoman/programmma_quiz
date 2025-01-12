@@ -12,8 +12,20 @@
 	if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["id_sessione"])){
 		$id_sessione = $_GET["id_sessione"];
 	}else{
-		go_to("homeStudente.php");
+
+        if ($_SESSION["id_ruolo"] == 2) {
+            go_to("homeStudente.php");
+        }else{
+            go_to("sessioneTestSvolti.php");
+        }
+    
 		exit();
+	}
+
+	if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["id_studente"])) {
+		$id_studente = $_GET["id_studente"];
+	}else{
+		$id_studente = $_SESSION["user_id"];
 	}
 
 	//prendi id test dalla sessione
@@ -63,7 +75,7 @@
 		// prendi la risposta data dall'utente
 		$sql = "SELECT risposta_data FROM risposte_date WHERE id_sessione = ? AND id_studente = ? AND id_domanda = ?";
 		$stmt = $conn->prepare($sql);
-		$stmt->bind_param("iii", $id_sessione, $_SESSION["user_id"], $domande[$i]["id"]);
+		$stmt->bind_param("iii", $id_sessione, $id_studente, $domande[$i]["id"]);
 		$stmt->execute();
 		$result = $stmt->get_result();
 		$row = $result->fetch_assoc();
@@ -75,9 +87,14 @@
 	}
 
 	$punteggio=0;
+	$domanda_chiusa = 0;
 	$total=0;
 
 	foreach ($domande as $domanda) {
+
+		if ($domanda["tipo"] != "aperta") {
+			$domanda_chiusa++;
+		}
 		$total++;
 	}
 
@@ -121,16 +138,33 @@
 </head>
 <body>
 
-	<?php include "include/navbar-studente.php"; ?>
+	<?php 
 
-	<div class="ms-5 mt-5 pt-4" style="margin-top: 100px;">
-		<nav aria-label="breadcrumb">
-			<ol class="breadcrumb">
-				<li class="breadcrumb-item"><a href="homeStudente.php">Home</a></li>
-				<li class="breadcrumb-item active" aria-current="page">Riepilogo test</li>
-			</ol>
-		</nav>
-	</div>
+		if ($_SESSION["id_ruolo"] == 2) {
+			include "include/navbar-studente.php";
+
+			echo '<div class="ms-5 mt-5 pt-4" style="margin-top: 100px;">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="homeStudente.php">Home</a></li>
+						<li class="breadcrumb-item active" aria-current="page">Riepilogo test</li>
+					</ol>
+				</nav>
+			</div>';
+		}else{
+			include "include/navbar-docente.php";
+
+			echo '<div class="ms-5 mt-5 pt-4" style="margin-top: 100px;">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="sessioneTestSvolti.php">Lista sessione test</a></li>
+						<li class="breadcrumb-item active" aria-current="page">Riepilogo test</li>
+					</ol>
+				</nav>
+			</div>';
+		}
+
+	?>
 
 	<dclass="mt-2">
 
@@ -140,8 +174,9 @@
 			<div class="card-body">
 				<h4 class="fw-bold">Riepilogo</h4>
 				<hr/>
-				<p class="card-text m-0">Punteggio: <span class="fw-bold"><?php echo $punteggio;?></span>/<?php echo $total;?> (<?php echo round(($punteggio/$total)*100, 2);?>%)</p>
-				<p class="card-text m-0">Voto: <span class="fw-bold"><?php $risultato=round(($punteggio/$total)*10, 2); if($risultato<=5){echo "<span style='color:#ed6053;'>$risultato</span>";}else if($risultato==10){echo "<span style='color:#c561ff;text-shadow:0 0 5px #cf6fff;'>$risultato</span>";}else{echo "<span style='color: #0da837;'>$risultato</span>";};?></span></p>
+				<p class="card-text m-0">Totale domande: <span class="fw-bold"><?php echo $total;?></span></p>
+				<p class="card-text m-0">Punteggio risposta multipla: <span class="fw-bold"><?php echo $punteggio;?></span>/<?php echo $domanda_chiusa;?> (<?php echo round(($punteggio/$domanda_chiusa)*100, 2);?>%)</p>
+				<p class="card-text m-0">Voto: <span class="fw-bold"><?php $risultato=round(($punteggio/$domanda_chiusa)*10, 2); if($risultato<=5){echo "<span style='color:#ed6053;'>$risultato</span>";}else if($risultato==10){echo "<span style='color:#c561ff;text-shadow:0 0 5px #cf6fff;'>$risultato</span>";}else{echo "<span style='color: #0da837;'>$risultato</span>";};?></span></p>
 			</div>
 		</div>
 
