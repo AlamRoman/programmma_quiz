@@ -9,12 +9,22 @@
 		go_to("login_page.php");
 	}
 
-	if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["id_test"])){
-		$id_test = $_GET["id_test"];
+	if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["id_sessione"])){
+		$id_sessione = $_GET["id_sessione"];
 	}else{
-		go_to("studenti.php");
+		go_to("homeStudente.php");
 		exit();
 	}
+
+	//prendi id test dalla sessione
+    $sql = "SELECT * FROM sessione_test WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id_sessione);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $sessione = $result->fetch_assoc();
+
+    $id_test = $sessione["id_test"];
 
 	//prendi il test da database
 	$sql = "SELECT * FROM test WHERE id = ?";
@@ -51,9 +61,9 @@
 		$domande[$i]["risposte"] = $r;
 
 		// prendi la risposta data dall'utente
-		$sql = "SELECT risposta_data FROM risposte_date WHERE id_test = ? AND id_user = ? AND id_domanda = ?";
+		$sql = "SELECT risposta_data FROM risposte_date WHERE id_sessione = ? AND id_studente = ? AND id_domanda = ?";
 		$stmt = $conn->prepare($sql);
-		$stmt->bind_param("iii", $id_test, $_SESSION["user_id"], $domande[$i]["id"]);
+		$stmt->bind_param("iii", $id_sessione, $_SESSION["user_id"], $domande[$i]["id"]);
 		$stmt->execute();
 		$result = $stmt->get_result();
 		$row = $result->fetch_assoc();
@@ -64,10 +74,21 @@
 		}
 	}
 
-	// For test purposes only
-	$punteggio=20;
-	$total=20;
+	$punteggio=0;
+	$total=0;
 
+	foreach ($domande as $domanda) {
+		$total++;
+	}
+
+	$sql = "SELECT * FROM risultati WHERE id_sessione = ?";
+	$stmt = $conn->prepare($sql);
+	$stmt->bind_param("i", $id_sessione);
+	$stmt->execute();
+	$result = $stmt->get_result();
+	$risultato = $result->fetch_assoc();
+
+	$punteggio = $risultato["punteggio"];
 ?>
 
 <!DOCTYPE html>
