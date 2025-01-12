@@ -18,10 +18,12 @@
         $data_fine = $_POST['data_fine'];
     
         $sql = "INSERT INTO sessione_test (id_test, nome, id_classe, data_inizio, data_fine, stato) VALUES (?, ?, ?, ?, ?, ?)";
-    
-        if ($current_date < $start_date) {
+
+        $stato = "";
+
+        if ($current_date < $data_inizio) {
             $stato = 'programmato'; 
-        } elseif ($current_date >= $start_date && $current_date <= $end_date) {
+        } elseif ($current_date >= $data_inizio && $current_date <= $data_fine) {
             $stato = 'in corso'; 
         } else {
             $stato = 'completo';

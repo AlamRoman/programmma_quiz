@@ -14,13 +14,13 @@
         $stmt->bind_param("i", $testId);
 
         if ($stmt->execute()) {
-            header("Location: ../docenti.php?deleted=1");
+            header("Location: ../homeDocente.php?deleted=1");
         } else {
-            header("Location: ../docenti.php?deleted=0");
+            header("Location: ../homeDocente.php?deleted=0");
         }
         $stmt->close();
     } else {
-        header("Location: ../docenti.php");
+        header("Location: ../homeDocente.php");
     }
 
 ?>
