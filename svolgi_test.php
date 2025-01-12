@@ -9,37 +9,79 @@
         go_to("login_page.php");
     }
 
-    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["id_test"])){
-        $id_test = $_GET["id_test"];
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["id_test"]) && isset($_POST["invia"])) {
-        $id_test = $_POST["id_test"];
+    $punteggio = 0;
+
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["id_sessione"])){
+        $id_sessione = $_GET["id_sessione"];
+    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["id_sessione"]) && isset($_POST["invia"])) {
+        $id_sessione = $_POST["id_sessione"];
         $id_user = $_SESSION["user_id"];
         unset($_POST['invia']);
 
         // Salva le risposte date
         foreach ($_POST["risposte"] as $id_domanda => $risposta_data) {
-            $sql = "INSERT INTO risposte_date (id_test, id_user, id_domanda, tipologia_domanda, risposta_data) 
+            $sql = "INSERT INTO risposte_date (id_sessione, id_studente, id_domanda, tipologia_domanda, risposta_data) 
                     VALUES (?, ?, ?, 
                     (SELECT tipo FROM domanda WHERE id = ?), ?) 
-                    ON DUPLICATE KEY UPDATE risposta_data = ?";
+                    ON DUPLICATE KEY UPDATE risposta_data = ? ";
             $stmt = $conn->prepare($sql);
 
+            $sql2 = "SELECT * from domanda WHERE id = ?";
+            $stmt2 = $conn->prepare($sql2);
+            $stmt2->bind_param('i', $id_domanda);
+            $stmt2->execute();
+            $result = $stmt2->get_result();
+            $domanda = $result->fetch_assoc();
+
             // Converti l'indice numerico per risposte multiple
-            if (is_array($risposta_data)) {
-                $risposta_data = implode(",", array_map('strval', $risposta_data));
+            if ($domanda["tipo"] == "multipla") {
+
+                echo $risposta_data;
+
+                $verifica_risposta_data = "";
+
+                list($temp, $verifica_risposta_data) = explode("_", $risposta_data);
+
+                $sql2 = "SELECT * from risposta WHERE id = ?";
+                $stmt2 = $conn->prepare($sql2);
+                $stmt2->bind_param('i', $verifica_risposta_data);
+                $stmt2->execute();
+                $result = $stmt2->get_result();
+                $risposta = $result->fetch_assoc();
+
+                if ($risposta["corretta"] == 1) {
+                    $punteggio += 1;
+                }
+                
+                $risposta_data = $temp;
             }
 
-            $stmt->bind_param("iiiiss", $id_test, $id_user, $id_domanda, $id_domanda, $risposta_data, $risposta_data);
+            $stmt->bind_param("iiiiss", $id_sessione, $id_user, $id_domanda, $id_domanda, $risposta_data, $risposta_data);
             $stmt->execute();
         }
 
+        $sql = "INSERT INTO risultati(id_sessione, id_studente, punteggio) VALUES (?,?,?);";
+        $stmt = $conn->prepare(query: $sql);
+        $stmt->bind_param("iii", $id_sessione, $id_user, $punteggio);
+        $stmt->execute();
+
         // Redirect al riepilogo
-        go_to("studenti.php");
+        go_to("homeStudente.php");
         exit();
     } else {
-        go_to("studenti.php");
+        go_to("homeStudente.php");
         exit();
     }
+
+    //prendi id test dalla sessione
+    $sql = "SELECT * FROM sessione_test WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id_sessione);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $sessione = $result->fetch_assoc();
+
+    $id_test = $sessione["id_test"];
 
     // Prendi il test dal database
     $sql = "SELECT * FROM test WHERE id = ?";
@@ -105,7 +147,7 @@
         <h2 class="fw-bold text-center mt-5"><?php echo $test["titolo"] ?></h2>
         <p class="text-center mb-5"><?php echo $test["descrizione"] ?></p>
         <form method="POST" action="svolgi_test.php" class="w-90 container mt-3 mb-3">
-            <input type="hidden" name="id_test" value="<?php echo $id_test; ?>">
+            <input type="hidden" name="id_sessione" value="<?php echo $id_sessione; ?>">
             <?php 
                 foreach ($domande as $domanda) {
                     echo "<div class='card mb-3'>";
@@ -113,7 +155,7 @@
                     echo "<h5 class='card-title'>" . $domanda["testo"] . "</h5>";
                     foreach ($domanda["risposte"] as $key => $risposta) {
                         echo "<div class='form-check'>";
-                        echo "<input class='form-check-input' type='radio' name='risposte[" . $domanda["id"] . "]' value='" . $key+1 . "'>";
+                        echo "<input class='form-check-input' type='radio' name='risposte[" . $domanda["id"] . "]' value='" . $key + 1 ."_".$risposta["id"]. "'>";
                         echo "<label class='form-check-label'>" . $risposta["testo"] . "</label>";
                         echo "</div>";
                     }
