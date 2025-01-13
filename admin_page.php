@@ -53,6 +53,16 @@
         }else if(isset($_GET["delete"])){
             
             if($_GET["delete"] !== $_SESSION["user_id"]){
+
+                $sql = "DELETE FROM sessione_test WHERE creato_da = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("i", $_GET["delete"]);
+                $stmt->execute();
+
+                $sql = "DELETE FROM test WHERE creato_da = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("i", $_GET["delete"]);
+                $stmt->execute();
                 
                 $sql = "DELETE FROM users WHERE id = ?";
                 $stmt = $conn->prepare($sql);

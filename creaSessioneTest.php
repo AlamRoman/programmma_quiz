@@ -103,7 +103,7 @@
                     <option value="" disabled selected>Seleziona un test</option>
 
                     <?php
-                        $sql_test = "SELECT id, titolo FROM test";
+                        $sql_test = "SELECT id, titolo FROM test WHERE creato_da = ".intval($_SESSION["user_id"]).";";
                         $result_test = $conn->query($sql_test);
                         while ($row_test = $result_test->fetch_assoc()) {
                             echo "<option value='" . $row_test['id'] . "'>" . $row_test['titolo'] . "</option>";

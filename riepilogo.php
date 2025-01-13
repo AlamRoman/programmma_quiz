@@ -127,13 +127,18 @@
 		}
 		input[type="radio"][disabled] {
 			opacity: 100 !important;
-			pointer-events: none; /* Evita interazioni */
+			pointer-events: none;
 			color: #000 !important;
 		}
 		input[type="radio"][disabled]:checked + label {
-			font-weight: bold; /* Indica chiaramente il selezionato */
+			font-weight: bold; 
 			color: #000 !important;
 		}
+
+		.grow-wrap{
+			border: 1px solid #000 !important;
+		}
+
 	</style>
 </head>
 <body>
@@ -199,7 +204,7 @@
 							}
 						}
 						if ($domanda["tipo"] === "aperta") {
-							echo "<textarea class='form-control auto-grow' disabled style='resize: none; min-height: 50px; overflow-y: hidden;'>" . htmlspecialchars($domanda["risposta_data"]) . "</textarea>";
+							echo "<div class='ta p-1'><textarea class='form-control auto-grow' disabled style='resize: none; min-height: 50px; overflow-y: hidden;'>" . htmlspecialchars($domanda["risposta_data"]) . "</textarea></div>";
 						}
 						echo "</div></div>";
 					}

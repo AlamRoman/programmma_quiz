@@ -41,7 +41,7 @@
 
     //prendi le sessioni
     $sql = "
-        SELECT 
+    SELECT 
         s.id, 
         s.id_test, 
         s.nome,
@@ -56,9 +56,11 @@
     JOIN 
         test t ON s.id_test = t.id
     JOIN 
-        classe c ON s.id_classe = c.id;
+        classe c ON s.id_classe = c.id
+    WHERE 
+        s.creato_da = " . intval($_SESSION["user_id"]) . ";
+";
 
-    ";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $result = $stmt->get_result();
