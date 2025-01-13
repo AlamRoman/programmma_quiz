@@ -77,6 +77,7 @@
             $nome_classe = trim($_POST['nome_classe']);
             $anno_inizio = intval($_POST['anno_inizio']);
             $anno_fine = intval($_POST['anno_fine']);
+            $msg_registra = "";
 
             if (empty($nome_classe) || empty($anno_inizio) || empty($anno_fine)) {
                 $msg_registra = "Tutti i campi sono obbligatori.";

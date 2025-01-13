@@ -73,7 +73,7 @@
         exit();
     }
 
-    //prendi id test dalla sessione
+    // Prendi id test dalla sessione
     $sql = "SELECT * FROM sessione_test WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id_sessione);
