@@ -41,7 +41,7 @@
                     <a class="nav-link fw-bold <?php echo (basename($_SERVER['PHP_SELF']) == 'homeDocente.php' || basename($_SERVER['PHP_SELF']) == 'creaTest.php' || basename($_SERVER['PHP_SELF']) == 'modificaTest.php') ? 'nav_active' : ''; ?>" href="homeDocente.php">Lista Test</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link fw-bold <?php echo (basename($_SERVER['PHP_SELF']) == 'sessione_test.php' || basename($_SERVER['PHP_SELF']) == 'creaSessioneTest.php') ? 'nav_active' : ''; ?>" href="sessione_test.php">Sessione test</a>
+                    <a class="nav-link fw-bold <?php echo (basename($_SERVER['PHP_SELF']) == 'sessione_test.php' || basename($_SERVER['PHP_SELF']) == 'creaSessioneTest.php' || basename($_SERVER['PHP_SELF']) == 'modificaSessioneTest.php') ? 'nav_active' : ''; ?>" href="sessione_test.php">Sessione test</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link fw-bold <?php echo (basename($_SERVER['PHP_SELF']) == 'sessioneTestSvolti.php' || basename($_SERVER['PHP_SELF']) == 'riepilogo.php') ? 'nav_active' : ''; ?>" href="sessioneTestSvolti.php">Test svolti</a>

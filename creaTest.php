@@ -58,7 +58,7 @@
             }
         }
 
-        header("location:docenti.php?testCreato=1");
+        header("location:homeDocente.php?testCreato=1");
     }
 
 
